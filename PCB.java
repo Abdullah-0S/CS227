@@ -1,18 +1,17 @@
-public class PCB
-    {
+public class PCB {
     private int id;
-    private Sta state;
+    private State state;
     private long time;
     private String text;
 
     // Constructor
-    public PCB(int id, Sta state,String text) {
+    public PCB(int id, State state,String text) {
         this.id = id;
         this.state = state;
         this.text = text;
     }
     public String getText(){
-        return text;
+        return text
     }
     public void setText(String text)
     {
@@ -30,12 +29,12 @@ public class PCB
     }
 
     // Getter for 'state'
-    public Sta getState() {
+    public State getState() {
         return state;
     }
 
     // Setter for 'state'
-    public void setState(Sta state) {
+    public void setState(State state) {
         this.state = state;
     }
 
@@ -49,4 +48,7 @@ public class PCB
         this.time = time;
     }
 
+}
+public enum State {
+    Waiting, Ready, Finish;
 }
