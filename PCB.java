@@ -1,4 +1,5 @@
-public class PCB {
+import java.util.PriorityQueue;
+public class PCB implements Comparable<PCB> {
     private int id;
     private State state;
     private int burstTime;
@@ -6,12 +7,21 @@ public class PCB {
     private int firstResponseTime;
     private long time;
     private String text;
+    private int priority;
 
-    public PCB(int id, int burstTime, int reqMemory, String text) {
+    public PCB(int pid, int burstTime, int priority ,int reqMemory) {
         this.id = id;
         this.burstTime = burstTime;
         this.reqMemory = reqMemory;
-        this.text = text;
+
+    }
+    public PCB(int variables[])
+    {
+        this.id = variables[0];
+        this.burstTime = variables[1];
+        this.priority = variables[2];
+        this.reqMemory = variables[3];
+;
     }
 
     public int getId() {
@@ -69,8 +79,12 @@ public class PCB {
     public void setText(String text) {
         this.text = text;
     }
+    @Override
+    public int compareTo(PCB other) {
+        return Integer.compare(this.priority, other.priority);
+    }
 }
 
 enum State {
-    READY, RUNNING, WAITING, TERMINATED
+    READY, RUNNING, JobQueue ,PriorityReadyQueue ,Terminated;
 }
