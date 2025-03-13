@@ -1,13 +1,11 @@
-import java.util.PriorityQueue;
 public class PCB implements Comparable<PCB> {
     private int id;
-    private State state;
-    private int burstTime;
+    private State state; //
+    private int burstTime; 
     private int reqMemory;
-    private int firstResponseTime;
-    private long time;
-    private String text;
-    private int priority;
+    private int FinishTime; // 
+    private long WaitingTime;
+    private int priority; 
 
     public PCB(int pid, int burstTime, int priority ,int reqMemory) {
         this.id = id;
@@ -21,7 +19,6 @@ public class PCB implements Comparable<PCB> {
         this.burstTime = variables[1];
         this.priority = variables[2];
         this.reqMemory = variables[3];
-;
     }
 
     public int getId() {
@@ -57,27 +54,19 @@ public class PCB implements Comparable<PCB> {
     }
 
     public int getFirstResponseTime() {
-        return firstResponseTime;
+        return FinishTime;
     }
 
-    public void setFirstResponseTime(int firstResponseTime) {
-        this.firstResponseTime = firstResponseTime;
+    public void setFirstResponseTime(int FinishTime) {
+        this.FinishTime = FinishTime;
     }
 
     public long getTime() {
-        return time;
+        return WaitingTime;
     }
 
-    public void setTime(long time) {
-        this.time = time;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
+    public void setTime(long WaitingTime) {
+        this.WaitingTime = WaitingTime;
     }
     @Override
     public int compareTo(PCB other) {
