@@ -1,3 +1,5 @@
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 public class FCFS {
@@ -11,6 +13,8 @@ public class FCFS {
     public void schedule() {
         Queue<PCB> readyQueue = systemModel.readyQueue;
         
+        List<eachStep> eachSteps = new LinkedList<>();
+        
         System.out.println("\nExecuting FCFS Scheduling:");
 
         while (!readyQueue.isEmpty()) {
@@ -22,13 +26,14 @@ public class FCFS {
             process.setFirstResponseTime((int) time);
 
             System.out.println("Process " + process.getId() + " executed from " + time + " to " + (time + process.getBurstTime()));
-
+            eachSteps.addLast(new eachStep(process.getId(), time, time + process.getBurstTime()));
             // تحديث الزمن
             time += process.getBurstTime();
             
             process.setState(State.Terminated);
             systemModel.free(process);
         }
+        RR.gantChart(eachSteps);
     }
     
     // Testing the FCFS Scheduler

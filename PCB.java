@@ -9,9 +9,11 @@ public class PCB implements Comparable<PCB> {
     private int priority; 
 
     public PCB(int pid, int burstTime, int priority ,int reqMemory) {
-        this.id = id;
+        this.id = pid;
         this.burstTime = burstTime;
         this.reqMemory = reqMemory;
+        
+        this.FirstResponseTime = -1; // to know if the process has not executed
 
     }
     public PCB(int variables[])
@@ -20,6 +22,9 @@ public class PCB implements Comparable<PCB> {
         this.burstTime = variables[1];
         this.priority = variables[2];
         this.reqMemory = variables[3];
+        
+        this.FirstResponseTime = -1; // to know if the process has not executed
+
     }
 
     public int getId() {
@@ -78,10 +83,19 @@ public class PCB implements Comparable<PCB> {
     public void addWaitingTime(long time){
         this.WaitingTime += time;
     }
+
+    
+    @Override
+    public String toString() {
+        return "PCB [id=" + id + ", state=" + state + ", burstTime=" + burstTime + ", reqMemory=" + reqMemory
+                + ", FinishTime=" + FinishTime + ", FirstResponseTime=" + FirstResponseTime + ", WaitingTime="
+                + WaitingTime + ", priority=" + priority + "]";
+    }
     @Override
     public int compareTo(PCB other) {
         return Integer.compare(this.priority, other.priority);
     }
+
 }
 
 enum State {

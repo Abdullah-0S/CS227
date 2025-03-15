@@ -38,6 +38,37 @@ public class readFile {
         }
         return list; 
     }
+    public static List<PCB> read_returnPcbs(String filePath)
+    {
+        List<PCB> list = new LinkedList<>();
+        list.clear();
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (line.trim().isEmpty() ) {
+                    continue;
+                }
+                                                        // 1:2:3:4;1024
+                String[] parts = line.split(";"); // { 1:2:3:4 , 1024 }
+                
+                String[] values = parts[0].split(":"); // { 1, 2 ,3 ,4}
+                
+                int pid = Integer.parseInt(values[0]);
+                int burstTime_In_ms = Integer.parseInt(values[1]);
+                int priority = Integer.parseInt(values[2]);
+                int reqMemory = Integer.parseInt(parts[1]);
+
+                list.add(new PCB (new int[] {pid, burstTime_In_ms, priority, reqMemory}) );
+
+            }
+        }
+        catch (IOException e) 
+        {
+            e.printStackTrace();
+        
+        }
+        return list; 
+    } 
 // Testing
     public static void main(String[] args) {
         List<int[]> l = read("job.txt");
@@ -49,6 +80,17 @@ public class readFile {
                 continue;
             }
             System.out.println("ID: " + l.get(i)[0] + ", burst In ms: " + l.get(i)[1] + ", Priority: " + l.get(i)[2] + ", Required Memory in MB : " + l.get(i)[3]);
+        }
+        List<PCB> list = read_returnPcbs("job.txt");
+        for (int i = 0 ; i < list.size(); i++)
+        {
+            //if(list.get(i) )
+           // {
+             //   System.out.println("Error in line " + i + " in the file");
+               // continue;
+            //}
+            System.out.println();
+            System.out.println(list.get(i));
         }
     }
 
