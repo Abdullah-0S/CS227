@@ -17,7 +17,7 @@ public class FCFS {
             PCB process = readyQueue.poll();
             
             // حساب زمن الانتظار لكل عملية
-            process.setTime(time);
+            process.setWaitingTime(time);
             process.setState(State.RUNNING);
             process.setFirstResponseTime((int) time);
 

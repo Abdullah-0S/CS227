@@ -3,7 +3,8 @@ public class PCB implements Comparable<PCB> {
     private State state; //
     private int burstTime; 
     private int reqMemory;
-    private int FinishTime; // 
+    private long FinishTime; 
+    private long FirstResponseTime; 
     private long WaitingTime;
     private int priority; 
 
@@ -53,20 +54,29 @@ public class PCB implements Comparable<PCB> {
         this.reqMemory = reqMemory;
     }
 
-    public int getFirstResponseTime() {
-        return FinishTime;
+    public long getFinishTime() {
+        return this.FinishTime;
     }
-
-    public void setFirstResponseTime(int FinishTime) {
+    
+    public void setFinishTime(long FinishTime) {
         this.FinishTime = FinishTime;
     }
+    public long getFirstResponseTime() {
+        return this.FirstResponseTime;
+    }
+    public void setFirstResponseTime(long FirstResponseTime) {
+        this.FirstResponseTime = FirstResponseTime;
+    }   
 
-    public long getTime() {
+    public long getWaitingTime() {
         return WaitingTime;
     }
 
-    public void setTime(long WaitingTime) {
+    public void setWaitingTime(long WaitingTime) {
         this.WaitingTime = WaitingTime;
+    }
+    public void addWaitingTime(long time){
+        this.WaitingTime += time;
     }
     @Override
     public int compareTo(PCB other) {
