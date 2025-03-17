@@ -1,13 +1,17 @@
+import java.io.IOError;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.Scanner;
 public class model implements SystemCalls
 {
     Queue<PCB> readyQueue = new LinkedList<PCB>();
     PriorityQueue<PCB> priorityReadyQueue = new PriorityQueue<PCB>();
     Queue<PCB> JobQueue = new LinkedList<PCB>();
     Queue<PCB> RunningQueue = new LinkedList<PCB>();
+
     private int currentmemory = 2048;
 
     public void createProcess(PCB pcb) // create Process and add it to the Job Queue
@@ -16,60 +20,94 @@ public class model implements SystemCalls
         JobQueue.add(pcb);
         System.out.println("Process created with PID: " + pcb.getId());
     }
-    public void killProcess(PCB pcb)
+
+    public void killProcess(int pid)
     {
-        if (pcb.getState() == State.READY)
+        for (PCB pcb : JobQueue) 
         {
-            readyQueue.remove(pcb);
+            if (pcb.getId() == pid) 
+            {
+                JobQueue.remove(pcb);
+                free(pcb);
+                System.out.println("Process killed with PID: " + pcb.getId());
+                pcb = null;
+                return;
+            }
         }
-        else if (pcb.getState() == State.JobQueue)
+        for (PCB pcb : readyQueue) 
         {
-            JobQueue.remove(pcb);
+            if (pcb.getId() == pid) 
+            {
+                readyQueue.remove(pcb);
+                free(pcb);
+                System.out.println("Process killed with PID: " + pcb.getId());
+                pcb = null;
+                return;
+            }
         }
-        else if (pcb.getState() == State.RUNNING)
+        for (PCB pcb : priorityReadyQueue) 
         {
-            RunningQueue.remove(pcb);
-        }
-        else if (pcb.getState() == State.PriorityReadyQueue)
+            if (pcb.getId() == pid) 
+            {
+                priorityReadyQueue.remove(pcb);
+                free(pcb);
+                System.out.println("Process killed with PID: " + pcb.getId());
+                pcb = null;
+                return;
+            }
+        }            
+
+        for (PCB pcb : RunningQueue) 
         {
-            priorityReadyQueue.remove(pcb);
-        }
-        free(pcb);
-        System.out.println("Process killed with PID: " + pcb.getId());
-        pcb = null;
+            if (pcb.getId() == pid) 
+            {
+                RunningQueue.remove(pcb);
+                free(pcb);
+                System.out.println("Process killed with PID: " + pcb.getId());
+                pcb = null;
+                return;
+            }
+        }       
     }
     public void load() // load the process from the job queue to the ready queue
     {
-        PCB pcb = JobQueue.peek();
-        if (malloc(pcb) == -1) // if memory is full
+        if (JobQueue.isEmpty())
         {
+            System.out.println("Job Queue is empty");
             return;
         }
-        pcb = JobQueue.poll();
+        PCB pcb = JobQueue.poll();
+        if (malloc(pcb) == -1) // if memory is full
+        {
+            JobQueue.add(pcb); // add process back to try again later
+            return;
+        }
         pcb.setState(State.READY);
         readyQueue.add(pcb);
         System.out.println("Process loaded with PID: " + pcb.getId());
     }
-    public void loadpq() // load the process from the job queue to the priorty ready queue
+    public void loadAll_Process()
     {
-        PCB pcb = JobQueue.peek();
-        if (malloc(pcb) == -1) // if memory is full
+        for(int i = 0 ; i < JobQueue.size(); i++)
         {
-            return;
+            load();
         }
-        pcb.setState(State.PriorityReadyQueue);
-        priorityReadyQueue.add(pcb);
-        System.out.println("Process loaded with PID: " + pcb.getId());
+
     }
-    public List<int[]> read(String filePath)
+
+    public void read(String filePath) throws IOException
     {
-        return readFile.read("job.txt");
+        List<PCB> list = readFile.read_returnPcbs(filePath);
+        for (PCB pcb : list)
+        {
+            createProcess(pcb);
+        }
     }
     public int malloc(PCB pcb)
     {
         if (currentmemory < pcb.getReqMemory())
         {
-            System.out.println("Memory is full");
+            System.out.println("Memory is full can't add process with PID: " + pcb.getId());
             return -1;
         }
         currentmemory -= pcb.getReqMemory();
@@ -82,26 +120,50 @@ public class model implements SystemCalls
         System.out.println("Memory freed from process with PID: " + pcb.getId()+ " Memory left: " + currentmemory);
         pcb = null;
     }
-    public void execute(Algorithm algo)
+    public void execute(Algorithm algo, int numOfProccess)
     {
-        PCB pcb = readyQueue.poll();
-        pcb.setState(State.RUNNING);
-        RunningQueue.add(pcb);
+        if (readyQueue.isEmpty())
+        {
+            System.out.println("ready queue is empty");
+            return;
+        }
+        if (readyQueue.size() < numOfProccess)
+        {
+            System.out.println("Not enough processes in the ready queue , only " + readyQueue.size() + " processes are available");
+            return;
+        }
+        //Adding running state also adding to the running queue
+        PCB pcb = null;
+        for (int i = 0; i < numOfProccess; i++) {
+            pcb = readyQueue.poll();
+            pcb.setState(State.RUNNING);
+            RunningQueue.add(pcb);
+        }   
+
         switch (algo) 
         {
             case FCFS:
-                
-                break;
+                FCFS fcfs = new FCFS(this);
+                fcfs.schedule(RunningQueue);  
+            break;
             case Round_Robin:
+                RR rr = new RR();
+                System.out.println("Enter the quantum time: ");
+                System.out.print("-->");
+                Scanner s = new Scanner(System.in);
+                int quantum = s.nextInt();
+                rr.RRsechdual(RunningQueue, quantum);
+
                 break;
             case Priority:
-                break;
+                Priorty priorty = new Priorty(this);
+                priorty.PQ(RunningQueue);
+            break;
             default:
                 break;
         }
-        RunningQueue.poll();
-        pcb.setState(State.Terminated);
-        free(pcb);
+        //TODO need to make algorithm turn around time and waiting time
+        
     }
     public void print_ReadyQueue()
     {
@@ -141,7 +203,7 @@ public class model implements SystemCalls
     }
     public void print_Memory()
     {
-        System.out.println("Memory left: " + currentmemory);
+        System.out.println("Current Memory: " + currentmemory);
     }
    public void print_allQueue(){
         print_JobQueue();

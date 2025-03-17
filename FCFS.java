@@ -10,9 +10,9 @@ public class FCFS {
         this.systemModel = systemModel;
     }
 
-    public void schedule() {
-        Queue<PCB> readyQueue = systemModel.readyQueue;
+    public Queue<PCB> schedule(Queue<PCB> readyQueue) {
         
+        Queue<PCB> finishedQueue = new LinkedList<>();
         List<eachStep> eachSteps = new LinkedList<>();
         
         System.out.println("\nExecuting FCFS Scheduling:");
@@ -21,19 +21,24 @@ public class FCFS {
             PCB process = readyQueue.poll();
             
             // حساب زمن الانتظار لكل عملية
+            process.setFirstResponseTime( time);
             process.setWaitingTime(time);
             process.setState(State.RUNNING);
-            process.setFirstResponseTime((int) time);
 
             System.out.println("Process " + process.getId() + " executed from " + time + " to " + (time + process.getBurstTime()));
             eachSteps.addLast(new eachStep(process.getId(), time, time + process.getBurstTime()));
             // تحديث الزمن
             time += process.getBurstTime();
-            
+
+            process.setFinishTime(time);
+            process.setBurstTime(0);
             process.setState(State.Terminated);
+
+            finishedQueue.add(process);
             systemModel.free(process);
         }
         RR.gantChart(eachSteps);
+        return finishedQueue;
     }
     
     // Testing the FCFS Scheduler
@@ -52,7 +57,6 @@ public class FCFS {
         }
 
         // Run FCFS Scheduler
-        FCFS fcfsScheduler = new FCFS(systemModel);
-        fcfsScheduler.schedule();
+        systemModel.execute(Algorithm.FCFS,systemModel.readyQueue.size());
     }
 }

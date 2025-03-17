@@ -1,4 +1,5 @@
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.LinkedList;
@@ -38,7 +39,7 @@ public class readFile {
         }
         return list; 
     }
-    public static List<PCB> read_returnPcbs(String filePath)
+    public static List<PCB> read_returnPcbs(String filePath) throws IOException
     {
         List<PCB> list = new LinkedList<>();
         list.clear();
@@ -64,7 +65,7 @@ public class readFile {
         }
         catch (IOException e) 
         {
-            e.printStackTrace();
+            System.out.println("Error in reading the file");
         
         }
         return list; 
@@ -81,7 +82,13 @@ public class readFile {
             }
             System.out.println("ID: " + l.get(i)[0] + ", burst In ms: " + l.get(i)[1] + ", Priority: " + l.get(i)[2] + ", Required Memory in MB : " + l.get(i)[3]);
         }
-        List<PCB> list = read_returnPcbs("job.txt");
+        List<PCB> list = null;
+        try {
+          list = read_returnPcbs("job.txt");   
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+
         for (int i = 0 ; i < list.size(); i++)
         {
             //if(list.get(i) )

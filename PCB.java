@@ -1,16 +1,18 @@
 public class PCB implements Comparable<PCB> {
     private int id;
-    private State state; //
     private int burstTime; 
+    private int priority; 
     private int reqMemory;
+    
+    private State state; //
     private long FinishTime; 
     private long FirstResponseTime; 
     private long WaitingTime;
-    private int priority; 
 
     public PCB(int pid, int burstTime, int priority ,int reqMemory) {
         this.id = pid;
         this.burstTime = burstTime;
+        this.priority = priority;
         this.reqMemory = reqMemory;
         
         this.FirstResponseTime = -1; // to know if the process has not executed
@@ -83,6 +85,12 @@ public class PCB implements Comparable<PCB> {
     public void addWaitingTime(long time){
         this.WaitingTime += time;
     }
+    public int getPriority() {
+        return priority;
+    }
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
 
     
     @Override
@@ -91,9 +99,13 @@ public class PCB implements Comparable<PCB> {
                 + ", FinishTime=" + FinishTime + ", FirstResponseTime=" + FirstResponseTime + ", WaitingTime="
                 + WaitingTime + ", priority=" + priority + "]";
     }
-    @Override
+
+    @Override // For Priorty Schduling
     public int compareTo(PCB other) {
-        return Integer.compare(this.priority, other.priority);
+        if (this.priority == other.priority) {
+            return Integer.compare(this.id, other.id); // FIFO order for same priority
+        }
+        return Integer.compare(other.priority, this.priority); // Higher priority first
     }
 
 }
