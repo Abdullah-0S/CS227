@@ -10,6 +10,8 @@ public class model implements SystemCalls
     Queue<PCB> readyQueue = new LinkedList<PCB>();
     Queue<PCB> JobQueue = new LinkedList<PCB>();
     Queue<PCB> RunningQueue = new LinkedList<PCB>();
+    performance p1 ,p2 ,p3;
+
 
     private int currentmemory = 2048;
     private final int MaxMemory;
@@ -189,27 +191,58 @@ public class model implements SystemCalls
         {
             case FCFS:
                 FCFS fcfs = new FCFS(this);
-                fcfs.schedule(RunningQueue);  
+                p1 = new performance(Algorithm.FCFS,fcfs.schedule(RunningQueue));
+                System.out.println(p1);  
             break;
             case Round_Robin:
-                RR rr = new RR();
                 System.out.println("Enter the quantum time: ");
                 System.out.print("-->");
                 Scanner s = new Scanner(System.in);
                 int quantum = s.nextInt();
-                rr.RRsechdual(RunningQueue, quantum);
-
+                p2 = new performance(Algorithm.Round_Robin, RR.RRsechdual(RunningQueue, quantum));
+                System.out.println(p2);
                 break;
+
             case Priority:
                 Priorty priorty = new Priorty(this);
-                priorty.PQ(RunningQueue);
+                p3 = new performance(Algorithm.Priority, priorty.PQ(RunningQueue));
+                System.out.println(p3);
             break;
+
+            case All:
+            FCFS fcfs1 = new FCFS(this);
+            p1 = new performance(Algorithm.FCFS, fcfs1.scheduleWithoutFree(copy(RunningQueue)));
+            System.out.println(p1);  
+        
+            System.out.println("Enter the quantum time: ");
+            System.out.print("-->");
+            Scanner s1 = new Scanner(System.in);
+            int quantum1 = s1.nextInt();
+            p2 = new performance(Algorithm.Round_Robin, RR.RRsechdualWithoutFree(copy(RunningQueue), quantum1));
+            System.out.println(p2);
+        
+            Priorty priorty1 = new Priorty(this);
+            p3 = new performance(Algorithm.Priority, priorty1.PQWithoutFree(copy(RunningQueue)));
+            System.out.println(p3);
+            break;
+
             default:
                 break;
         }
-        //TODO need to make algorithm turn around time and waiting time
-        
+  
     }
+    public void print_bestPerformance(status s)
+    {
+        if (p1 == null || p2 == null || p3 == null)
+        {
+            System.out.println("No performance data available , try executing all algorithms first");
+            return;
+        }
+        performance best = new performance();
+        best = best.BetterPerformanceAt(p1, p2, p3, s);
+        System.out.println(best);
+    }
+
     public void print_ReadyQueue()
     {
         System.out.println("Ready Queue: { ");
@@ -245,11 +278,20 @@ public class model implements SystemCalls
    public void print_allQueue(){
         print_JobQueue();
         print_ReadyQueue();
-        print_RunningQueue();
-        
+        print_RunningQueue();   
    } 
+
+   public Queue<PCB> copy(Queue<PCB> q)
+   {
+       Queue<PCB> copy = new LinkedList<PCB>();
+       for (PCB pcb : q)
+       {
+           copy.add(new PCB(pcb));
+       }
+       return copy;
+   }
 }
 enum Algorithm
 {
-    FCFS, Round_Robin, Priority;
+    FCFS, Round_Robin, Priority,All;
 }

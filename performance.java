@@ -10,16 +10,21 @@ public class performance {
     private long totalWaitingTime;
     private long totalFirstResponseTime;
     private long totalFinishResponseTime;
-    private State state;
+    
+    private Algorithm algo;
     
     private Queue<PCB> FinishedQueue;
     
-    public performance(State state , Queue<PCB> FinishedQueue)
+    public performance(Algorithm algo , Queue<PCB> FinishedQueue)
     {
-        this.state = state;
+        this.algo = algo;
         this.FinishedQueue = FinishedQueue;
         fill();
         calculate();
+    }
+    public performance()
+    {
+
     }
 
     public void fill()
@@ -27,7 +32,7 @@ public class performance {
         for (int i = 0; i < FinishedQueue.size(); i++) 
         {
             PCB e = FinishedQueue.poll();
-            totalTurnAroundTime += e.getBurstTime() + e.getWaitingTime();
+            this.setTotalTurnAroundTime(this.getTotalTurnAroundTime() + (e.getFinishTime() - e.getFirstResponseTime()));
             totalWaitingTime += e.getWaitingTime();
             totalFirstResponseTime += e.getFirstResponseTime();
             totalFinishResponseTime += e.getFinishTime();
@@ -37,10 +42,11 @@ public class performance {
 
     public void calculate()
     {
-        avgTurnAroundTime = (double) totalTurnAroundTime / FinishedQueue.size();
-        avgWaitingTime = (double) totalWaitingTime / FinishedQueue.size();
-        avgFirstResponseTime = (double) totalFirstResponseTime / FinishedQueue.size();
-        avgFinishResponseTime = (double) totalFinishResponseTime / FinishedQueue.size();
+        double size = 1.0 * FinishedQueue.size();
+        avgTurnAroundTime =  this.getTotalTurnAroundTime() / size;
+        avgWaitingTime =  totalWaitingTime / size;
+        avgFirstResponseTime =  totalFirstResponseTime / size;
+        avgFinishResponseTime =  totalFinishResponseTime / size;
     }
 
     //getters
@@ -76,18 +82,19 @@ public class performance {
         return totalFinishResponseTime;
     }
 
-    public State getState() {
-        return state;
+    public Algorithm getAlgorithm() {
+        return algo;
     }
     
-    public performance BetterPerformanceAt(performance p1 , performance p2, performance p3, performance p4, status s)
+    
+    public performance BetterPerformanceAt(performance p1 , performance p2, performance p3, status s)
     {
         double i = 0;
         performance p = null;
         switch (s) {
             case TurnAroundTime:
             
-            i = Math.min(Math.min(p1.getAvgTurnAroundTime(), p2.getAvgTurnAroundTime()), Math.min(p3.getAvgTurnAroundTime(), p4.getAvgTurnAroundTime()));
+            i = Math.min(Math.min(p1.getAvgTurnAroundTime(), p2.getAvgTurnAroundTime()), Math.min(p3.getAvgTurnAroundTime(), p3.getAvgTurnAroundTime() ));
             
             if(i == p1.getAvgTurnAroundTime())
                 p = p1;
@@ -95,14 +102,13 @@ public class performance {
                 p = p2;
             else if(i == p3.getAvgTurnAroundTime())
                 p = p3;
-            else if(i == p4.getAvgTurnAroundTime())
-                p = p4;
+
             
             break;
             
             case WaitingTime:
             
-            i = Math.min(Math.min(p1.getAvgWaitingTime(), p2.getAvgWaitingTime()), Math.min(p3.getAvgWaitingTime(), p4.getAvgWaitingTime()));
+            i = Math.min(Math.min(p1.getAvgWaitingTime(), p2.getAvgWaitingTime()), Math.min(p3.getAvgWaitingTime(), p3.getAvgWaitingTime()));
             
             if(i == p1.getAvgWaitingTime())
                 p = p1;
@@ -110,12 +116,11 @@ public class performance {
                 p = p2;
             else if(i == p3.getAvgWaitingTime())
                 p = p3;
-            else if(i == p4.getAvgWaitingTime())            
-                p = p4;
+
             break;
             
             case FirstResponseTime:
-                i = Math.min(Math.min(p1.getAvgFirstResponseTime(), p2.getAvgFirstResponseTime()), Math.min(p3.getAvgFirstResponseTime(), p4.getAvgFirstResponseTime()));
+                i = Math.min(Math.min(p1.getAvgFirstResponseTime(), p2.getAvgFirstResponseTime()), Math.min(p3.getAvgFirstResponseTime(), p3.getAvgFirstResponseTime()));
 
                 if(i == p1.getAvgFirstResponseTime())
                     p = p1;
@@ -123,13 +128,12 @@ public class performance {
                     p = p2;
                 else if(i == p3.getAvgFirstResponseTime())
                     p = p3;
-                else if(i == p4.getAvgFirstResponseTime())
-                    p = p4;
+
             break;
 
             case FinishResponseTime:
                 
-                i = Math.min(Math.min(p1.getAvgFinishResponseTime(), p2.getAvgFinishResponseTime()), Math.min(p3.getAvgFinishResponseTime(), p4.getAvgFinishResponseTime()));
+                i = Math.min(Math.min(p1.getAvgFinishResponseTime(), p2.getAvgFinishResponseTime()), Math.min(p3.getAvgFinishResponseTime(), p3.getAvgFinishResponseTime()));
 
                 if(i == p1.getAvgFinishResponseTime())
                     p = p1;
@@ -137,15 +141,14 @@ public class performance {
                     p = p2;
                 else if(i == p3.getAvgFinishResponseTime())
                     p = p3;
-                else if(i == p4.getAvgFinishResponseTime())
-                    p = p4;
+
             break;
 
             default:
                 System.out.println("Invalid status");
             break;
         }
-        System.out.println("The Best Performance of " + s + " is: " + i + "ms in " + s +
+        System.out.println("The Best Performance of " + s + " is: " + i + "ms in " + p.getAlgorithm()+
         " with status represented by {AvgTurnAroundTime: " + getAvgTurnAroundTime() + "ms, " +
         "AvgWaitingTime: " + getAvgWaitingTime() + "ms, " +
         "AvgFirstResponseTime: " + getAvgFirstResponseTime() + "ms, " +
@@ -153,15 +156,41 @@ public class performance {
 
         return p;
     }
+
     @Override
     public String toString()
     {
-        return "The Performance of " + state + " is: " +
+        return "The Performance of " + algo + " is: " +
         "{AvgTurnAroundTime: " + avgTurnAroundTime + "ms, " +
         "AvgWaitingTime: " + avgWaitingTime + "ms, " +
         "AvgFirstResponseTime: " + avgFirstResponseTime + "ms, " +
         "AvgFinishResponseTime: " + avgFinishResponseTime + "ms}";
     }
+
+    public void setTotalTurnAroundTime(long totalTurnAroundTime) {
+        this.totalTurnAroundTime = totalTurnAroundTime;
+    }
+
+    public void setTotalWaitingTime(long totalWaitingTime) {
+        this.totalWaitingTime = totalWaitingTime;
+    }
+
+    public void setTotalFirstResponseTime(long totalFirstResponseTime) {
+        this.totalFirstResponseTime = totalFirstResponseTime;
+    }
+
+    public void setTotalFinishResponseTime(long totalFinishResponseTime) {
+        this.totalFinishResponseTime = totalFinishResponseTime;
+    }
+
+    public void setAlgorithm(Algorithm algo) {
+        this.algo = algo;
+    }
+
+    public void setFinishedQueue(Queue<PCB> FinishedQueue) {
+        this.FinishedQueue = FinishedQueue;
+    }
+
     
 }
 enum status {

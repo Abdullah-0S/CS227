@@ -3,6 +3,7 @@ import java.util.List;
 import java.util.Queue;
 
 public class RR {
+
     static model m = new model();
         // I Want u to implement the following algorithim and when process is started set its waiting time and finish time 
         public static Queue<PCB> RRsechdual(Queue<PCB> RunningQueue, int quantum) {
@@ -39,6 +40,48 @@ public class RR {
             
                             FinishedQueue.add(runningProcess);
                             m.free(runningProcess);
+                        }
+                    }
+                    
+                    gantChart(eachStep);
+
+                    return FinishedQueue;
+                }
+
+                public static Queue<PCB> RRsechdualWithoutFree(Queue<PCB> RunningQueue, int quantum) {
+                    long time = 0; // This is waiting time in queue set for each process
+                    Queue<PCB> FinishedQueue = new LinkedList<PCB>(); // PCB with waiting time , first response ,and turn around info 
+                    List<eachStep> eachStep = new LinkedList<>(); // Each PCB steps in the schdual algorithm to print gant chart
+                     
+                    System.out.println("\nExecuting Round-Robin Scheduling:");
+            
+                    while (!RunningQueue.isEmpty())
+                    {
+                        PCB runningProcess = RunningQueue.poll();
+                        if ( runningProcess.getFirstResponseTime() == -1 ) { 
+                            runningProcess.setFirstResponseTime(time); // This if statment to set the first response of a proces
+                        }  
+                        runningProcess.addWaitingTime( time - runningProcess.getWaitingTime());
+            
+                        if ( runningProcess.getBurstTime() > quantum)
+                        {
+                            System.out.println("Process " + runningProcess.getId() + " executed from " + time + " to " + (time + quantum ));
+                            eachStep.addLast(new eachStep(runningProcess.getId(), time , time + quantum) );
+                            runningProcess.setWaitingTime(time);
+                            time += quantum;
+                            runningProcess.setBurstTime(runningProcess.getBurstTime() - quantum);
+                            RunningQueue.add(runningProcess); 
+                        } 
+                        else
+                        {
+                            System.out.println("Process " + runningProcess.getId() + " executed from " + time + " to " + (time + runningProcess.getBurstTime() ));
+                            eachStep.addLast(new eachStep(runningProcess.getId(), time , time + runningProcess.getBurstTime()) );
+                            time += runningProcess.getBurstTime();
+                            runningProcess.setBurstTime(0);
+                            runningProcess.setFinishTime(time);
+            
+                            FinishedQueue.add(runningProcess);
+                            //m.free(runningProcess);
                         }
                     }
                     

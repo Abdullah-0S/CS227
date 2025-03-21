@@ -16,7 +16,6 @@ public class PCB implements Comparable<PCB> {
         this.reqMemory = reqMemory;
         
         this.FirstResponseTime = -1; // to know if the process has not executed
-
     }
     public PCB(int variables[])
     {
@@ -27,6 +26,18 @@ public class PCB implements Comparable<PCB> {
         
         this.FirstResponseTime = -1; // to know if the process has not executed
 
+    }
+    public PCB(PCB pcb)
+    {
+        this.id = pcb.id;
+        this.burstTime = pcb.burstTime;
+        this.priority = pcb.priority;
+        this.reqMemory = pcb.reqMemory;
+        
+        this.state = pcb.state;
+        this.FinishTime = pcb.FinishTime;
+        this.FirstResponseTime = pcb.FirstResponseTime;
+        this.WaitingTime = pcb.WaitingTime;
     }
 
     public int getId() {

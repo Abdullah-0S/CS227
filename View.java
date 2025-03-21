@@ -272,13 +272,13 @@ public class View{
                     System.out.println("2. Priority");
                     System.out.println("3. Round Robin");
                     System.out.println("4 Back to System Calls");
-                    System.out.println("5. Exit");
+                    System.out.println("-1. Exit");
                    System.out.print("-->");
                    option2 = s.nextInt();
                    System.out.println();
                    switch (option2) {
                            case 1:
-                               m.execute(Algorithm.FCFS, numOfProccess);
+                                m.execute(Algorithm.FCFS, numOfProccess);                              
                            break;
 
                            case 2:

@@ -55,6 +55,47 @@ public class Priorty {
             RR.gantChart(steps); //Print Gant Chart
 		return finishedQueue; // Return the queue containing finished processes
 	}
+	public Queue<PCB> PQWithoutFree(Queue<PCB> runningQueue) {
+
+        List<eachStep> steps = new LinkedList<>();
+
+		PriorityQueue<PCB> priorityQueue = new PriorityQueue<>();
+		Queue<PCB> finishedQueue = new LinkedList<>(); // Queue to store finished processes
+
+		// Step 2: Move processes from Ready Queue to Priority Queue
+		priorityQueue.addAll(runningQueue);
+		System.out.println("\nExecuting Non-Preemptive Priority Scheduling:");
+		System.out.println("Priority Queue Size: " + priorityQueue.size());
+
+		while (!priorityQueue.isEmpty()) {
+			PCB process = priorityQueue.poll(); // Get highest priority process
+
+
+			// Set first response time (if not already set)
+			if (process.getFirstResponseTime() == -1) {
+				process.setFirstResponseTime( time);
+			}
+
+			// Calculate waiting time (total time spent before execution starts)
+			process.setWaitingTime(time - 0); //Todo: Check this
+
+			// Execute process
+			System.out.println("Executing Process ID: " + process.getId() + ", Priority: " + process.getPriority());
+			System.out.println(
+					"Process " + process.getId() + " executed from " + time + " to " + (time + process.getBurstTime()));
+            steps.addLast(new eachStep(process.getId() , time, time + process.getBurstTime())); //For Gant Chart
+
+			time += process.getBurstTime(); // Update total execution time
+			process.setState(State.Terminated);
+			process.setFinishTime(time); // Store finish time
+
+			//systemModel.free(process);
+
+			finishedQueue.add(process);
+		}
+            RR.gantChart(steps); //Print Gant Chart
+		return finishedQueue; // Return the queue containing finished processes
+	}
 
 	// Testing
 	public static void main(String[] args) {
