@@ -8,17 +8,72 @@ import java.util.Scanner;
 public class model implements SystemCalls
 {
     Queue<PCB> readyQueue = new LinkedList<PCB>();
-    PriorityQueue<PCB> priorityReadyQueue = new PriorityQueue<PCB>();
     Queue<PCB> JobQueue = new LinkedList<PCB>();
     Queue<PCB> RunningQueue = new LinkedList<PCB>();
 
     private int currentmemory = 2048;
+    private final int MaxMemory;
+
+    public model()
+    {
+        this.MaxMemory = currentmemory;
+    }
 
     public void createProcess(PCB pcb) // create Process and add it to the Job Queue
     {
+        if (!UniqueID(pcb.getId()))
+        {
+            System.out.println("Process with PID: " + pcb.getId() + " already exists");
+            return;
+        }
+        if (pcb.getId() < 0)
+        {
+            System.out.println("PID can't be negative");
+            return;
+        }
+        if (pcb.getReqMemory() > MaxMemory)
+        {
+            System.out.println("Memory required by the process is greater than the available memory");
+            return;
+        }
+         
         pcb.setState(State.JobQueue);
         JobQueue.add(pcb);
         System.out.println("Process created with PID: " + pcb.getId());
+    }
+
+    public boolean UniqueID(Integer ID)
+    {
+        boolean Unique = true;
+        PCB e;
+        for (int i = 0; i < readyQueue.size(); i++) 
+        {
+            e = readyQueue.poll();
+            if (ID == e.getId()) 
+                Unique = false;
+            readyQueue.add(e);
+        }
+
+        if(!Unique) return Unique;
+
+        for (int i = 0; i < RunningQueue.size(); i++) 
+        {
+            e = RunningQueue.poll();
+            if (ID == e.getId()) 
+                Unique = false;
+                RunningQueue.add(e);
+        }
+        
+        if(!Unique) return Unique;
+
+        for (int i = 0; i < JobQueue.size(); i++)
+        {
+            e = JobQueue.poll();
+            if (ID == e.getId()) 
+                Unique = false;
+            JobQueue.add(e);            
+        }
+        return Unique;
     }
 
     public void killProcess(int pid)
@@ -45,17 +100,7 @@ public class model implements SystemCalls
                 return;
             }
         }
-        for (PCB pcb : priorityReadyQueue) 
-        {
-            if (pcb.getId() == pid) 
-            {
-                priorityReadyQueue.remove(pcb);
-                free(pcb);
-                System.out.println("Process killed with PID: " + pcb.getId());
-                pcb = null;
-                return;
-            }
-        }            
+               
 
         for (PCB pcb : RunningQueue) 
         {
@@ -192,15 +237,7 @@ public class model implements SystemCalls
         }
         System.out.print("}\n");
     }
-    public void print_PriorityReadyQueue()
-    {
-        System.out.println("Priority Queue: { ");
-        for (PCB pcb : priorityReadyQueue)
-        {
-            System.out.println("PID: " + pcb.getId()+" ,");
-        }
-        System.out.print("}\n");
-    }
+    
     public void print_Memory()
     {
         System.out.println("Current Memory: " + currentmemory);
@@ -209,7 +246,7 @@ public class model implements SystemCalls
         print_JobQueue();
         print_ReadyQueue();
         print_RunningQueue();
-        print_PriorityReadyQueue();
+        
    } 
 }
 enum Algorithm

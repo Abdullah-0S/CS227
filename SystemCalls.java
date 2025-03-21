@@ -14,7 +14,6 @@ public interface SystemCalls
     public void print_ReadyQueue(); // This function will print the ready queue
     public void print_JobQueue(); // This function will print the job queue
     public void print_RunningQueue(); // This function will print the running queue
-    public void print_PriorityReadyQueue(); // This function will print the priority queue
     public void print_Memory(); // This function will print the memory
     public void print_allQueue(); // This function will print all the queues
 }

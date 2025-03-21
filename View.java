@@ -29,7 +29,8 @@ public class View{
                 case 1:
                     System.out.println("Please Enter the file name:");
                     System.out.print("-->");
-                    String fileName = s.next();
+                    s.nextLine();
+                    String fileName = s.nextLine();
                     System.out.println();
                     try 
                     {   
@@ -46,16 +47,32 @@ public class View{
                     System.out.println();
                     System.out.println("Enter the Process ID:");
                     System.out.print("-->");
-                    int pid = s.nextInt();
-                    System.out.println();
-                    if (pid < 0 ) 
+                    Integer pid = s.nextInt();
+
+                    s.nextLine();
+                    pid = positive_Num(pid);
+                    if( !m.UniqueID(pid))
                     {
+                        Boolean unique = true;
                         do
                         {
-                            System.out.println("Enter a positive number");
-                            pid = s.nextInt();
-                        } while (pid > 0);                   
+                            if(pid < 0)
+                            {
+                                System.out.println("The ID must be positive Please Enter positive ID");
+                                System.out.print("-->");
+                                pid = s.nextInt();
+                            }
+                            else
+                            {
+                                System.out.println("The ID isn't Unique Please Enter Unique ID");
+                                System.out.print("-->");
+                                pid = s.nextInt();
+                            }
+                            unique = m.UniqueID(pid);
+                        } while (!unique || pid < 0);
                     }
+                    
+                   
                     System.out.println("Enter the Burst Time");
                     System.out.print("-->");
                     int burstTime = s.nextInt();
@@ -68,7 +85,7 @@ public class View{
                             System.out.print("-->");
                             burstTime = s.nextInt();
                             System.out.println();
-                        } while (burstTime > 0);                   
+                        } while (burstTime < 0);                   
                     }
                     System.out.println("Enter the Priority");
                     System.out.print("-->");
@@ -82,7 +99,7 @@ public class View{
                             System.out.print("-->");
                             priority = s.nextInt();
                             System.out.println();
-                        } while (priority > 0);                   
+                        } while (priority < 0);                   
                     }
                     System.out.println("Enter the Required Memory");
                     System.out.print("-->");
@@ -96,7 +113,7 @@ public class View{
                             System.out.print("-->");
                             reqMemory = s.nextInt();
                             System.out.println();
-                        } while (reqMemory > 0);                   
+                        } while (reqMemory < 0);                   
                 }
                     m.createProcess(new PCB(pid, burstTime, priority, reqMemory));
                     System.out.println("Process created and loadded to the job queue  with PID: " + pid);
@@ -106,14 +123,35 @@ public class View{
                     display_systemcall();
                 break;
 
+                case -1:
+                    System.out.println("Exiting the application");
+                    System.out.println("Goodbye");
+                    System.exit(0);
+                break;
+
                 default:
                     System.out.println("Invalid option");
                 break;
             }
             
-        }while (option != 3);
+        }while (option != -1);
     
     }
+    
+    public int positive_Num(int num) // make user to enter positive number
+    {
+        if (num < 0 ) 
+        {
+            do
+            {
+                System.out.println("Enter a positive number");
+                System.out.print("-->");
+                num = s.nextInt();
+            } while (num < 0);                   
+        }
+        return num;
+    }
+
     public void display_systemcall()
     {
         int option = 0;
@@ -282,7 +320,7 @@ public class View{
                         System.out.println("Invalid option");
                     break;
                 }
-        }while (option != -1);
+        }while (option != -1 && option != 11);
     }
 
     public static void main(String[] args) 
