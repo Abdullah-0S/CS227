@@ -1,3 +1,4 @@
+import java.io.ObjectInputFilter.Status;
 import java.util.Scanner;
 
 public class View{
@@ -171,9 +172,11 @@ public class View{
             System.out.println("*   8.Print Memory                      *");
             System.out.println("*   9.Execute # of process (pick algo)  *");
             System.out.println("*   10.Execute all process (pick algo)  *");
-            System.out.println("*   11.Back To Main Menu                *");
+            System.out.println("*   11.Execute all process (all algo)   *");
+            System.out.println("*   12.Best Performance algorithm       *");
             System.out.println("*                                       *");
-            System.out.println("*   -1.exit                             *");
+            System.out.println("*   -2.Back To Main Menu                *");
+            System.out.println("*   -1.Exit                             *");
             System.out.println(lineOfStars);
             System.out.print("-->");
             option = s.nextInt();
@@ -306,10 +309,61 @@ public class View{
                     }
                     break;
                                     
-                    case 11: //11.Back To Main Menu 
+                    case 11: //11.Execute all process (all algo)
+                        m.execute(Algorithm.All, m.readyQueue.size());
+                    break;
+                    
+                    case 12: //12.Best Performance algorithm
+                        System.out.println("To get best result please use System Call Number 11 then this option");
+                        System.out.println("Please select an option:");
+                        System.out.println("1.  Average Turn Around Time");
+                        System.out.println("2.  Average Waiting Time");
+                        System.out.println("3.  Average First Response Time");
+                        System.out.println("4.  Average Finish Response Time");
+                        System.out.println("5.  Back to System Calls");
+                        System.out.println("-1.  Exit");
+                        System.out.print("-->");
+                        int option3 = s.nextInt();
+                        System.out.println();
+                        switch (option3) {
+                            case 1:
+                                m.print_bestPerformance(status.TurnAroundTime);
+                            break;
+                            
+                            case 2:
+                                m.print_bestPerformance(status.WaitingTime);
+                            break;
+                            
+                            case 3:
+                                m.print_bestPerformance(status.FirstResponseTime);
+                            break;
+
+                            case 4:
+                                m.print_bestPerformance(status.FinishResponseTime);
+                            break;
+
+                            case 5:
+
+                            break;
+
+                            case -1:
+                                System.out.println("Exiting the application");
+                                System.out.println("Goodbye");
+                                System.exit(0);
+                            break;
+
+                            default:
+                                System.out.println("Invalid option");
+                            break;
+                        }
+                    break;
+                          
+                    
+
+                    case -2: //-2.Back To Main Menu    
                     
                     break;
-                                    
+
                     case -1:
                         System.out.println("Exiting the application");
                         System.out.println("Goodbye");
@@ -320,12 +374,11 @@ public class View{
                         System.out.println("Invalid option");
                     break;
                 }
-        }while (option != -1 && option != 11);
+        }while (option != -1 && option != -2);
     }
 
-    public static void main(String[] args) 
-    {
-        View v  = new View();
+    public static void main(String[] args) {
+        View v = new View();
         v.display_mainMenu();
     }
 }
