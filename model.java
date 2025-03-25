@@ -210,16 +210,18 @@ public class model implements SystemCalls
             break;
 
             case All:
-            FCFS fcfs1 = new FCFS(this);
-            p1 = new performance(Algorithm.FCFS, fcfs1.scheduleWithoutFree(copy(RunningQueue)));
-            System.out.println(p1);  
-        
             System.out.println("Enter the quantum time: ");
             System.out.print("-->");
             Scanner s1 = new Scanner(System.in);
             int quantum1 = s1.nextInt();
             p2 = new performance(Algorithm.Round_Robin, RR.RRsechdualWithoutFree(copy(RunningQueue), quantum1));
             System.out.println(p2);
+            
+            FCFS fcfs1 = new FCFS(this);
+            p1 = new performance(Algorithm.FCFS, fcfs1.scheduleWithoutFree(copy(RunningQueue)));
+            System.out.println(p1);  
+        
+            
         
             Priorty priorty1 = new Priorty(this);
             p3 = new performance(Algorithm.Priority, priorty1.PQWithoutFree(copy(RunningQueue)));

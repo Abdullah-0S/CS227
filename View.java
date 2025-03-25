@@ -1,10 +1,10 @@
-import java.io.ObjectInputFilter.Status;
 import java.util.Scanner;
 
 public class View{
     model m = new model();
     Scanner s = new Scanner(System.in);
-    String lineOfStars = new String("*").repeat(41); // 30 stars 
+    String lineOfStars = new String("*").repeat(41); // 41 stars 
+    Thread readThread,  LoadThread, ExcuteThread , killProcessThread;   
 
     public void display_mainMenu()
     {   
@@ -33,14 +33,10 @@ public class View{
                     s.nextLine();
                     String fileName = s.nextLine();
                     System.out.println();
-                    try 
-                    {   
-                        m.read(fileName);
-                    }
-                    catch(Exception e)
-                    {
-                        System.out.println("Error in reading the file");
-                    }
+                    MyRunnable reading = new MyRunnable(readThread, m,fileName);
+                    readThread = new Thread();
+                    readThread.start();
+                    
                     break;
                 
                 case 2:
@@ -189,7 +185,11 @@ public class View{
                 break;
 
                  case 2:
-                    m.loadAll_Process();
+                    LoadThread = new Thread(new MyRunnable(LoadThread, m));
+                    LoadThread.setDaemon(true); // if main dies it dies 
+                    LoadThread.start();
+
+                 //  m.loadAll_Process();
                 break;
 
                  case 3:
@@ -197,7 +197,9 @@ public class View{
                     System.out.print("-->");
                     int pid = s.nextInt();
                     System.out.println();
-                    m.killProcess(pid);
+                    //Need To Change from thread to runnable to give the pid 
+                    killProcessThread = new Thread(new MyRunnable(killProcessThread, m,pid));
+                    killProcessThread.start();
                 break;
                 
                 case 4:
@@ -310,7 +312,8 @@ public class View{
                     break;
                                     
                     case 11: //11.Execute all process (all algo)
-                        m.execute(Algorithm.All, m.readyQueue.size());
+                        ExcuteThread = new Thread(new MyRunnable(ThreadState.Execute_all_algorithms, m));
+                        ExcuteThread.start();
                     break;
                     
                     case 12: //12.Best Performance algorithm
