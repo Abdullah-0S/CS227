@@ -33,8 +33,7 @@ public class View{
                     s.nextLine();
                     String fileName = s.nextLine();
                     System.out.println();
-                    MyRunnable reading = new MyRunnable(readThread, m,fileName);
-                    readThread = new Thread();
+                    readThread = new Thread(new MyRunnable(ThreadState.read, m,fileName));
                     readThread.start();
                     
                     break;
@@ -185,7 +184,7 @@ public class View{
                 break;
 
                  case 2:
-                    LoadThread = new Thread(new MyRunnable(LoadThread, m));
+                    LoadThread = new Thread(new MyRunnable(ThreadState.LoadToJobQueue, m));
                     LoadThread.setDaemon(true); // if main dies it dies 
                     LoadThread.start();
 
@@ -197,8 +196,7 @@ public class View{
                     System.out.print("-->");
                     int pid = s.nextInt();
                     System.out.println();
-                    //Need To Change from thread to runnable to give the pid 
-                    killProcessThread = new Thread(new MyRunnable(killProcessThread, m,pid));
+                    killProcessThread = new Thread(new MyRunnable(ThreadState.KillProcess, m,pid));
                     killProcessThread.start();
                 break;
                 
