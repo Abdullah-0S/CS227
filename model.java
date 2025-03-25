@@ -141,7 +141,42 @@ public class model implements SystemCalls
         }
 
     }
+    public void loadWithoutPrinting() // load the process from the job queue to the ready queue
+    {
+        if (JobQueue.isEmpty())
+        {
+            //System.out.println("Job Queue is empty");
+            return;
+        }
+        PCB pcb = JobQueue.poll();
+        if (mallocWithoutPrinting(pcb) == -1) // if memory is full
+        {
+            JobQueue.add(pcb); // add process back to try again later
+            return;
+        }
+        pcb.setState(State.READY);
+        readyQueue.add(pcb);
+        //System.out.println("Process loaded with PID: " + pcb.getId());
+    }
+    public void loadAll_ProcessWithoutPrinting()
+    {
+        for(int i = 0 ; i < JobQueue.size(); i++)
+        {
+            loadWithoutPrinting();
+        }
 
+    }
+    public int mallocWithoutPrinting(PCB pcb)
+    {
+        if (currentmemory < pcb.getReqMemory())
+        {
+            //System.out.println("Memory is full can't add process with PID: " + pcb.getId());
+            return -1;
+        }
+        currentmemory -= pcb.getReqMemory();
+        //System.out.println("Memory allocated to process with PID: " + pcb.getId()+ " Memory left: " + currentmemory);
+        return 0;
+    } 
     public void read(String filePath) throws IOException
     {
         List<PCB> list = readFile.read_returnPcbs(filePath);
@@ -178,6 +213,10 @@ public class model implements SystemCalls
         {
             System.out.println("Not enough processes in the ready queue , only " + readyQueue.size() + " processes are available");
             return;
+        }
+        if (algo == Algorithm.All)
+        {
+            numOfProccess = readyQueue.size();
         }
         //Adding running state also adding to the running queue
         PCB pcb = null;

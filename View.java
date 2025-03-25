@@ -35,7 +35,11 @@ public class View{
                     System.out.println();
                     readThread = new Thread(new MyRunnable(ThreadState.read, m,fileName));
                     readThread.start();
-                    
+                    try{
+                        Thread.sleep(1000);
+                    }catch(InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     break;
                 
                 case 2:
@@ -187,7 +191,7 @@ public class View{
                     LoadThread = new Thread(new MyRunnable(ThreadState.LoadToJobQueue, m));
                     LoadThread.setDaemon(true); // if main dies it dies 
                     LoadThread.start();
-
+                    System.out.println("Starting Loading...");
                  //  m.loadAll_Process();
                 break;
 
@@ -198,6 +202,11 @@ public class View{
                     System.out.println();
                     killProcessThread = new Thread(new MyRunnable(ThreadState.KillProcess, m,pid));
                     killProcessThread.start();
+                    try{
+                        Thread.sleep(3000);
+                    }catch(InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 break;
                 
                 case 4:
@@ -312,6 +321,11 @@ public class View{
                     case 11: //11.Execute all process (all algo)
                         ExcuteThread = new Thread(new MyRunnable(ThreadState.Execute_all_algorithms, m));
                         ExcuteThread.start();
+                        try{
+                            Thread.sleep(6000);
+                        }catch(InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     break;
                     
                     case 12: //12.Best Performance algorithm

@@ -73,8 +73,15 @@ public class MyRunnable implements Runnable {
 
             case LoadToJobQueue:
                 while(true)
-                    m.loadAll_Process();
-            
+                  {
+                    try{
+                        Thread.sleep(2000); 
+                        m.loadAll_ProcessWithoutPrinting();
+                    }catch(Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                  }
             case Execute_all_algorithms:
                 m.execute(Algorithm.All, -1); 
             break;
