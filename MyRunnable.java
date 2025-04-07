@@ -72,16 +72,33 @@ public class MyRunnable implements Runnable {
             break;
 
             case LoadToJobQueue:
-                while(true)
+                  while(!Thread.currentThread().isInterrupted())
                   {
                     try{
                         Thread.sleep(2000); 
                         m.loadAll_ProcessWithoutPrinting();
-                    }catch(Exception e)
+                    }catch(InterruptedException e)
                     {
-                        e.printStackTrace();
+                        break;                   
                     }
                   }
+                  System.out.println("End of loadding");
+            break;
+
+            case LoadToJobQueueWithComments:
+                  while(!Thread.currentThread().isInterrupted())
+                  {
+                    try{
+                        Thread.sleep(4000); 
+                        m.loadAll_Process();
+                    }catch(InterruptedException e)
+                    {
+                        break;                   
+                    }
+                  }
+                  System.out.println("End of loadding");    
+            break;
+
             case Execute_all_algorithms:
                 m.execute(Algorithm.All, -1); 
             break;
@@ -96,6 +113,7 @@ enum ThreadState
 {
     read,
     LoadToJobQueue,
+    LoadToJobQueueWithComments,
     Execute_all_algorithms,
     KillProcess
 }

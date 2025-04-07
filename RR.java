@@ -6,11 +6,18 @@ public class RR {
 
     static model m = new model();
         // I Want u to implement the following algorithim and when process is started set its waiting time and finish time 
-        public static Queue<PCB> RRsechdual(Queue<PCB> RunningQueue, int quantum) {
+        public static Queue<PCB> RRsechdual(Queue<PCB> readyQueue,int numOfProccess, int quantum) {
                     long time = 0; // This is waiting time in queue set for each process
                     Queue<PCB> FinishedQueue = new LinkedList<PCB>(); // PCB with waiting time , first response ,and turn around info 
                     List<eachStep> eachStep = new LinkedList<>(); // Each PCB steps in the schdual algorithm to print gant chart
                      
+                    Queue<PCB> RunningQueue = null;
+                    for (int i = 0; i < numOfProccess; i++)
+                    {
+                        //model will insure the ready queue isn't empty so it will not be null
+                        RunningQueue.add(readyQueue.poll());
+                    }
+
                     System.out.println("\nExecuting Round-Robin Scheduling:");
             
                     while (!RunningQueue.isEmpty())
@@ -48,11 +55,18 @@ public class RR {
                     return FinishedQueue;
                 }
 
-                public static Queue<PCB> RRsechdualWithoutFree(Queue<PCB> RunningQueue, int quantum) {
+                public static Queue<PCB> RRsechdualWithoutFree(Queue<PCB> readyQueue,int numOfProccess, int quantum) {
                     long time = 0; // This is waiting time in queue set for each process
                     Queue<PCB> FinishedQueue = new LinkedList<PCB>(); // PCB with waiting time , first response ,and turn around info 
                     List<eachStep> eachStep = new LinkedList<>(); // Each PCB steps in the schdual algorithm to print gant chart
-                     
+                    
+                    Queue<PCB> RunningQueue = null;
+                    for (int i = 0; i < numOfProccess; i++)
+                    {
+                        //model will insure the ready queue isn't empty so it will not be null
+                        RunningQueue.add(readyQueue.poll());
+                    }
+
                     System.out.println("\nExecuting Round-Robin Scheduling:");
             
                     while (!RunningQueue.isEmpty())
@@ -122,7 +136,7 @@ public class RR {
                         m.load();
                     }
                     m.print_allQueue();
-                    RRsechdual(m.readyQueue , 7);
+                    RRsechdual(m.readyQueue , m.readyQueue.size(), 7);
             
             
     }

@@ -1,15 +1,12 @@
-import java.io.IOError;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Scanner;
 public class model implements SystemCalls
 {
     Queue<PCB> readyQueue = new LinkedList<PCB>();
     Queue<PCB> JobQueue = new LinkedList<PCB>();
-    Queue<PCB> RunningQueue = new LinkedList<PCB>();
     performance p1 ,p2 ,p3;
 
 
@@ -58,13 +55,7 @@ public class model implements SystemCalls
 
         if(!Unique) return Unique;
 
-        for (int i = 0; i < RunningQueue.size(); i++) 
-        {
-            e = RunningQueue.poll();
-            if (ID == e.getId()) 
-                Unique = false;
-                RunningQueue.add(e);
-        }
+        
         
         if(!Unique) return Unique;
 
@@ -102,19 +93,7 @@ public class model implements SystemCalls
                 return;
             }
         }
-               
-
-        for (PCB pcb : RunningQueue) 
-        {
-            if (pcb.getId() == pid) 
-            {
-                RunningQueue.remove(pcb);
-                free(pcb);
-                System.out.println("Process killed with PID: " + pcb.getId());
-                pcb = null;
-                return;
-            }
-        }       
+             System.out.println("No Process found with id "+pid); 
     }
     public void load() // load the process from the job queue to the ready queue
     {
@@ -179,9 +158,8 @@ public class model implements SystemCalls
     } 
     public void read(String filePath) throws IOException
     {
-        List<PCB> list = readFile.read_returnPcbs(filePath);
-        for (PCB pcb : list)
-        {
+        List<PCB> process= readFile.read_returnPcbs(filePath);
+        for (PCB pcb : process) {
             createProcess(pcb);
         }
     }
@@ -218,19 +196,12 @@ public class model implements SystemCalls
         {
             numOfProccess = readyQueue.size();
         }
-        //Adding running state also adding to the running queue
-        PCB pcb = null;
-        for (int i = 0; i < numOfProccess; i++) {
-            pcb = readyQueue.poll();
-            pcb.setState(State.RUNNING);
-            RunningQueue.add(pcb);
-        }   
 
         switch (algo) 
         {
             case FCFS:
                 FCFS fcfs = new FCFS(this);
-                p1 = new performance(Algorithm.FCFS,fcfs.schedule(RunningQueue));
+                p1 = new performance(Algorithm.FCFS,fcfs.schedule(readyQueue , numOfProccess));
                 System.out.println(p1);  
             break;
             case Round_Robin:
@@ -238,32 +209,38 @@ public class model implements SystemCalls
                 System.out.print("-->");
                 Scanner s = new Scanner(System.in);
                 int quantum = s.nextInt();
-                p2 = new performance(Algorithm.Round_Robin, RR.RRsechdual(RunningQueue, quantum));
+                p2 = new performance(Algorithm.Round_Robin, RR.RRsechdual(readyQueue, numOfProccess, quantum));
                 System.out.println(p2);
                 break;
 
             case Priority:
                 Priorty priorty = new Priorty(this);
-                p3 = new performance(Algorithm.Priority, priorty.PQ(RunningQueue));
+                p3 = new performance(Algorithm.Priority, priorty.PQ(readyQueue, numOfProccess));
                 System.out.println(p3);
             break;
 
             case All:
+            // asking user to get the quantum for RR algo
             System.out.println("Enter the quantum time: ");
             System.out.print("-->");
             Scanner s1 = new Scanner(System.in);
             int quantum1 = s1.nextInt();
-            p2 = new performance(Algorithm.Round_Robin, RR.RRsechdualWithoutFree(copy(RunningQueue), quantum1));
+
+            numOfProccess = readyQueue.size();
+
+            // we used copy ready queue here becuase i dont want the original ready queue being altered
+            p2 = new performance(Algorithm.Round_Robin, RR.RRsechdualWithoutFree(copy(readyQueue),numOfProccess, quantum1));
             System.out.println(p2);
             
             FCFS fcfs1 = new FCFS(this);
-            p1 = new performance(Algorithm.FCFS, fcfs1.scheduleWithoutFree(copy(RunningQueue)));
+            // we used copy ready queue here becuase i dont want the original ready queue being altered
+            p1 = new performance(Algorithm.FCFS, fcfs1.scheduleWithoutFree(copy(readyQueue),numOfProccess ));
             System.out.println(p1);  
         
             
-        
+            // We used normal ready queue here because after executing this method readyqueue will be empty 
             Priorty priorty1 = new Priorty(this);
-            p3 = new performance(Algorithm.Priority, priorty1.PQWithoutFree(copy(RunningQueue)));
+            p3 = new performance(Algorithm.Priority, priorty1.PQ(readyQueue, numOfProccess));
             System.out.println(p3);
             break;
 
@@ -281,7 +258,7 @@ public class model implements SystemCalls
         }
         performance best = new performance();
         best = best.BetterPerformanceAt(p1, p2, p3, s);
-        System.out.println(best);
+        //System.out.println(best);
     }
 
     public void print_ReadyQueue()
@@ -289,7 +266,7 @@ public class model implements SystemCalls
         System.out.println("Ready Queue: { ");
         for (PCB pcb : readyQueue)
         {
-            System.out.println("PID: " + pcb.getId()+" ,");
+            System.out.print("PID: " + pcb.getId()+" ,");
         }
         System.out.print("}\n");
     }
@@ -302,24 +279,15 @@ public class model implements SystemCalls
         }
         System.out.print("}\n");
     }
-    public void print_RunningQueue()
-    {
-        System.out.println("Running Queue: { ");
-        for (PCB pcb : RunningQueue)
-        {
-            System.out.println("PID: " + pcb.getId()+" ,");
-        }
-        System.out.print("}\n");
-    }
     
     public void print_Memory()
     {
         System.out.println("Current Memory: " + currentmemory);
     }
+    
    public void print_allQueue(){
         print_JobQueue();
         print_ReadyQueue();
-        print_RunningQueue();   
    } 
 
    public Queue<PCB> copy(Queue<PCB> q)
@@ -330,6 +298,56 @@ public class model implements SystemCalls
            copy.add(new PCB(pcb));
        }
        return copy;
+   }
+   public int getMaxMemory()
+   {
+    return MaxMemory;
+   }
+   public void printMaxmemory()
+   {
+        System.out.println("Max Memory: " + MaxMemory);
+   }
+   public void displayProcessInfo(int pid)
+   {
+        for (PCB pcb : JobQueue) 
+        {
+            if (pcb.getId() == pid) 
+            {
+                System.out.println("Process info with PID: " + pcb.getId());
+                System.out.println(pcb);
+                return;
+            }
+        }
+        for (PCB pcb : readyQueue) 
+        {
+            if (pcb.getId() == pid) 
+            {
+                System.out.println("Process info with PID: " + pcb.getId());
+                System.out.println(pcb);
+                return;
+            }
+        }
+        System.out.println("No Process found with id "+pid); 
+   }
+
+   public void displayFirstProcessInfo()
+   {
+        if (JobQueue.size() > 0 )
+        {
+            System.out.println("The First Process info in job queue is: ");
+            System.out.println(JobQueue.peek());
+        }
+        else{
+            System.out.println("Job Queue is Empty");
+        }
+        if(readyQueue.size() > 0)
+        {
+            System.out.println("The First Process info in ready queue is: ");
+            System.out.println(readyQueue.peek());
+        }
+        else{
+            System.out.println("Ready Queue is Empty");
+        }
    }
 }
 enum Algorithm
