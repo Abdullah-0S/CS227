@@ -4,12 +4,12 @@ public class View{
     model m = new model();
     Scanner s = new Scanner(System.in);
     String lineOfStars = new String("*").repeat(41); // 41 stars 
-    Thread readThread,  LoadThread, ExcuteThread , killProcessThread;  
-    boolean killExecuted = false ; 
 
+    Thread readThread,LoadThread,ExcuteThread,killProcessThread;
+   
+    int option = 0;
     public void display_mainMenu()
     {   
-        int option = 0;
         do
         {
             System.out.println(lineOfStars);
@@ -22,9 +22,12 @@ public class View{
             System.out.println("*    -1.exit                            *");
             System.out.println("*                                       *");
             System.out.println(lineOfStars);
-            System.out.print("-->");
-            option = s.nextInt();
-            System.out.println();
+            if (option != -1)
+            {
+                System.out.print("-->");
+                option = s.nextInt();
+                System.out.println();
+            }
         
             switch(option)
             {
@@ -35,9 +38,10 @@ public class View{
                     String fileName = s.nextLine();
                     System.out.println();
                     readThread = new Thread(new MyRunnable(ThreadState.read, m,fileName));
+                    
                     readThread.start();
                     try{
-                        Thread.sleep(1000);
+                        readThread.join();
                     }catch(InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -135,10 +139,20 @@ public class View{
                     display_systemcall();
                 break;
 
-                case -1:
-                    System.out.println("Exiting the application");
-                    System.out.println("Goodbye");
-                    System.exit(0);
+                case -1: 
+                        // Killing background thread                            
+                        try
+                        {
+                            LoadThread.interrupt(); // i used interrupt here because i want the thread exit loading while loop and finish its codes then dies
+                            LoadThread.join();
+                            
+                        }catch(Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+
+                        System.out.println("Exiting...");
+                        System.out.println("Good bye ");;
                 break;
 
                 default:
@@ -222,7 +236,7 @@ public class View{
                  case 2:
                     LoadThread = new Thread(new MyRunnable(ThreadState.LoadToJobQueue, m));
                     
-                    //LoadThread = new Thread(new MyRunnable(ThreadState.LoadToJobQueueWithComments, m)); this same as a above but with comments memory full .. 
+                    //LoadThread = new Thread(new MyRunnable(ThreadState.LoadToJobQueueWithComments, m));  //this same as a above but with comments memory full .. 
 
                     LoadThread.setDaemon(true); // if main dies it dies 
                     LoadThread.start();
@@ -231,7 +245,6 @@ public class View{
                 break;
 
                  case 3:
-                    killExecuted = true;
                     System.out.println("Enter the Process ID to kill:");
                     System.out.print("-->");
                     int pid = s.nextInt();
@@ -239,7 +252,7 @@ public class View{
                     killProcessThread = new Thread(new MyRunnable(ThreadState.KillProcess, m,pid));
                     killProcessThread.start();
                     try{
-                        Thread.sleep(1000);
+                        killProcessThread.join();
                     }catch(InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -247,29 +260,19 @@ public class View{
                 
                 case 4:
                    // To not print a queue and another thread searching for killing process
-                   if (killExecuted)
-                    {
-                        try{ killProcessThread.join();} catch (Exception e) { e.printStackTrace();}
-                    }
-                    
+                   
                     m.print_JobQueue();
                 break;
                 
                 case 5:
                    // To not print a queue and another thread searching for killing process
-                   if (killExecuted)
-                    {
-                        try{ killProcessThread.join();} catch (Exception e) { e.printStackTrace();}
-                    }
+                   
                     m.print_ReadyQueue();
                 break;
 
                 case 6: 
                     // To not print a queue and another thread searching for killing process
-                    if (killExecuted)
-                    {
-                        try{ killProcessThread.join();} catch (Exception e) { e.printStackTrace();}
-                    }
+                    
                     m.print_allQueue();
                 break;
 
@@ -360,7 +363,7 @@ public class View{
                         ExcuteThread = new Thread(new MyRunnable(ThreadState.Execute_all_algorithms, m));
                         ExcuteThread.start();
                         try{
-                            Thread.sleep(4000);
+                            ExcuteThread.join();
                         }catch(InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -420,22 +423,7 @@ public class View{
 
                     case -2: //-2.Back To Main Menu    
                     case -1:
-                        // Killing threads                            
-                        try
-                        {
-                            readThread.join();
-
-                            LoadThread.interrupt(); // i used interrupt here because i want the thread exit loading while loop and finish its codes then dies
-
-                            ExcuteThread.join();
-                            killProcessThread.join();
-                        }catch(Exception e)
-                        {
-                            e.printStackTrace();
-                        }
-                        System.out.println("Exiting...");
-                        System.out.println("Good bye ");
-                
+             
                     break;
                                     
                     default:
@@ -443,6 +431,7 @@ public class View{
                     break;
                 }
         }while (option != -1 && option != -2);
+
     }
 
     public static void main(String[] args) {

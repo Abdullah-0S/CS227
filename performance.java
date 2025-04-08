@@ -90,7 +90,7 @@ public class performance {
     public performance BetterPerformanceAt(performance p1 , performance p2, performance p3, status s)
     {
         double i = 0;
-        performance p = null;
+        performance p = new performance();
         switch (s) {
             case TurnAroundTime:
             
@@ -149,10 +149,10 @@ public class performance {
             break;
         }
         System.out.println("The Best Performance of " + s + " is: " + i + "ms in " + p.getAlgorithm()+
-        " with status represented by {AvgTurnAroundTime: " + getAvgTurnAroundTime() + "ms, " +
-        "AvgWaitingTime: " + getAvgWaitingTime() + "ms, " +
-        "AvgFirstResponseTime: " + getAvgFirstResponseTime() + "ms, " +
-        "AvgFinishResponseTime: " + getAvgFinishResponseTime() + "ms}");
+        " with status represented by {AvgTurnAroundTime: " + p.getAvgTurnAroundTime() + "ms, " +
+        "AvgWaitingTime: " + p.getAvgWaitingTime() + "ms, " +
+        "AvgFirstResponseTime: " + p.getAvgFirstResponseTime() + "ms, " +
+        "AvgFinishResponseTime: " + p.getAvgFinishResponseTime() + "ms}");
 
         return p;
     }

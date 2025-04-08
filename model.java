@@ -30,6 +30,7 @@ public class model implements SystemCalls
             System.out.println("PID can't be negative");
             return;
         }
+
         if (pcb.getReqMemory() > MaxMemory)
         {
             System.out.println("Memory required by the process is greater than the available memory");
@@ -76,7 +77,6 @@ public class model implements SystemCalls
             if (pcb.getId() == pid) 
             {
                 JobQueue.remove(pcb);
-                free(pcb);
                 System.out.println("Process killed with PID: " + pcb.getId());
                 pcb = null;
                 return;
@@ -156,6 +156,7 @@ public class model implements SystemCalls
         //System.out.println("Memory allocated to process with PID: " + pcb.getId()+ " Memory left: " + currentmemory);
         return 0;
     } 
+
     public void read(String filePath) throws IOException
     {
         List<PCB> process= readFile.read_returnPcbs(filePath);
@@ -163,6 +164,7 @@ public class model implements SystemCalls
             createProcess(pcb);
         }
     }
+
     public int malloc(PCB pcb)
     {
         if (currentmemory < pcb.getReqMemory())
@@ -174,12 +176,16 @@ public class model implements SystemCalls
         System.out.println("Memory allocated to process with PID: " + pcb.getId()+ " Memory left: " + currentmemory);
         return 0;
     }
+
+
     public void free(PCB pcb)
     {
         currentmemory += pcb.getReqMemory();
         System.out.println("Memory freed from process with PID: " + pcb.getId()+ " Memory left: " + currentmemory);
         pcb = null;
     }
+
+    
     public void execute(Algorithm algo, int numOfProccess)
     {
         if (readyQueue.isEmpty())
