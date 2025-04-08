@@ -4,7 +4,8 @@ public class View{
     model m = new model();
     Scanner s = new Scanner(System.in);
     String lineOfStars = new String("*").repeat(41); // 41 stars 
-    Thread readThread,  LoadThread, ExcuteThread , killProcessThread;   
+    Thread readThread,  LoadThread, ExcuteThread , killProcessThread;  
+    boolean killExecuted = false ; 
 
     public void display_mainMenu()
     {   
@@ -230,6 +231,7 @@ public class View{
                 break;
 
                  case 3:
+                    killExecuted = true;
                     System.out.println("Enter the Process ID to kill:");
                     System.out.print("-->");
                     int pid = s.nextInt();
@@ -245,18 +247,29 @@ public class View{
                 
                 case 4:
                    // To not print a queue and another thread searching for killing process
-                try{ killProcessThread.join();} catch (Exception e) { e.printStackTrace();}
-
+                   if (killExecuted)
+                    {
+                        try{ killProcessThread.join();} catch (Exception e) { e.printStackTrace();}
+                    }
+                    
                     m.print_JobQueue();
                 break;
                 
                 case 5:
-                try{ killProcessThread.join();} catch (Exception e) { e.printStackTrace();}
-
+                   // To not print a queue and another thread searching for killing process
+                   if (killExecuted)
+                    {
+                        try{ killProcessThread.join();} catch (Exception e) { e.printStackTrace();}
+                    }
                     m.print_ReadyQueue();
                 break;
 
                 case 6: 
+                    // To not print a queue and another thread searching for killing process
+                    if (killExecuted)
+                    {
+                        try{ killProcessThread.join();} catch (Exception e) { e.printStackTrace();}
+                    }
                     m.print_allQueue();
                 break;
 

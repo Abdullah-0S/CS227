@@ -60,7 +60,7 @@ public class RR {
                     Queue<PCB> FinishedQueue = new LinkedList<PCB>(); // PCB with waiting time , first response ,and turn around info 
                     List<eachStep> eachStep = new LinkedList<>(); // Each PCB steps in the schdual algorithm to print gant chart
                     
-                    Queue<PCB> RunningQueue = null;
+                    Queue<PCB> RunningQueue = new LinkedList<PCB>();
                     for (int i = 0; i < numOfProccess; i++)
                     {
                         //model will insure the ready queue isn't empty so it will not be null
