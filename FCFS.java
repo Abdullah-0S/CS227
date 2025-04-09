@@ -1,6 +1,7 @@
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+//This class was done by Mohammed
 
 public class FCFS {
     private model systemModel;
