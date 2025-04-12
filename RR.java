@@ -112,10 +112,9 @@ public class RR {
                     System.out.println("----------------\nGant Chart\n---------------- " );
                     for (int i = 0; i < eachSteps.size();i++)
                     {
-                        String s = String.format("PID: %d, Start at %d, End at %d",eachSteps.get(i).pid,eachSteps.get(i).startTime,eachSteps.get(i).endTime);
-                        //System.out.printf("PID: %i"+ eachSteps.get(i).pid + ", Start at %l" + eachSteps.get(i).startTime +", End at %l" + eachSteps.get(i).endTime +"%5s\n" , hashtag );
-                        System.out.printf("%s%18s\n",s,hashtag);
-                        for (long j = eachSteps.get(i).startTime ; j < eachSteps.get(i).endTime; j++)
+                        String s = String.format("PID: %d, Start at %d, End at %d",eachSteps.get(i).pid,eachSteps.get(i).startTime,eachSteps.get(i).endTime); //This will print pid info first line 
+                        System.out.printf("%s%18s\n",s,hashtag); //This will print hashtag for first one ######
+                        for (long j = eachSteps.get(i).startTime ; j < eachSteps.get(i).endTime; j += 6)
                         {
                             empty = new String(" ").repeat(s.length());
                             System.out.printf("%s%18s\n",empty,stars);

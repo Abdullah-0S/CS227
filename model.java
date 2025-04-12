@@ -17,6 +17,12 @@ public class model implements SystemCalls
     {
         this.MaxMemory = currentmemory;
     }
+    public model(int Memory)
+    {
+        currentmemory = Memory;
+        MaxMemory = Memory;
+    }
+
 
     public void createProcess(PCB pcb) // create Process and add it to the Job Queue
     {
@@ -207,7 +213,7 @@ public class model implements SystemCalls
         {
             case FCFS:
                 FCFS fcfs = new FCFS(this);
-                p1 = new performance(Algorithm.FCFS,fcfs.schedule(readyQueue , numOfProccess));
+                //p1 = new performance(Algorithm.FCFS,fcfs.schedule(readyQueue , numOfProccess));
                 System.out.println(p1);  
             break;
             case Round_Robin:
@@ -221,7 +227,7 @@ public class model implements SystemCalls
 
             case Priority:
                 Priorty priorty = new Priorty(this);
-                p3 = new performance(Algorithm.Priority, priorty.PQ(readyQueue, numOfProccess));
+                //p3 = new performance(Algorithm.Priority, priorty.PQ(readyQueue, numOfProccess));
                 System.out.println(p3);
             break;
 
@@ -246,7 +252,7 @@ public class model implements SystemCalls
             
             // We used normal ready queue here because after executing this method readyqueue will be empty 
             Priorty priorty1 = new Priorty(this);
-            p3 = new performance(Algorithm.Priority, priorty1.PQ(readyQueue, numOfProccess));
+            //p3 = new performance(Algorithm.Priority, priorty1.PQ(readyQueue, numOfProccess));
             System.out.println(p3);
             break;
 

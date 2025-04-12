@@ -7,20 +7,26 @@ public class FCFS {
     private model systemModel;
     private long time = 0; // يمثل وقت الانتظار في الطابور لكل عملية
 
+    Queue<PCB> finishedQueue = new LinkedList<>();
+    List<eachStep> eachSteps = new LinkedList<>();
+
     public FCFS(model systemModel) {
         this.systemModel = systemModel;
     }
 
-    public Queue<PCB> schedule(Queue<PCB> readyQueue, int numOfProccess) 
+    public void schedule(Queue<PCB> readyQueue, Queue<PCB> jobQueue) 
     {
-        Queue<PCB> finishedQueue = new LinkedList<>();
-        List<eachStep> eachSteps = new LinkedList<>();
+        clearEachSteps();
+        clearFinishedQueue();
         
         System.out.println("\nExecuting FCFS Scheduling:");
 
-        while (numOfProccess > 0 ) {
+        while (! (jobQueue.isEmpty() && readyQueue.isEmpty()) ) {
             PCB process = readyQueue.poll();
-            
+            if (process == null)
+            {
+                continue;
+            }
             // حساب زمن الانتظار لكل عملية
             process.setFirstResponseTime( time);
             process.setWaitingTime(time);
@@ -37,10 +43,22 @@ public class FCFS {
 
             finishedQueue.add(process);
             systemModel.free(process);
-            numOfProccess--;
         }
-        RR.gantChart(eachSteps);
+    }
+    public Queue<PCB> getFinishedQueue() {
         return finishedQueue;
+    }
+    public List<eachStep> getEachSteps() {
+        return eachSteps;
+    }
+    public void clearFinishedQueue(){
+        finishedQueue.clear();
+    }
+    public void clearEachSteps(){
+        eachSteps.clear();
+    }
+    public void printGantChart(){
+        RR.gantChart(eachSteps);
     }
     
     public Queue<PCB> scheduleWithoutFree(Queue<PCB> readyQueue, int numOfProccess) {

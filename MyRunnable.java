@@ -75,7 +75,7 @@ public class MyRunnable implements Runnable {
                   while(!Thread.currentThread().isInterrupted())
                   {
                     try{
-                        Thread.sleep(2000); 
+                        Thread.sleep(000); 
                         m.loadAll_ProcessWithoutPrinting();
                     }catch(InterruptedException e)
                     {
