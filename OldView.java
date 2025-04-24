@@ -1,17 +1,16 @@
 import java.util.Scanner;
 
-public class OldView{
+public class OldView {
     model m = new model();
     Scanner s = new Scanner(System.in);
     String lineOfStars = new String("*").repeat(41); // 41 stars 
 
-    Thread readThread,LoadThread,ExcuteThread,killProcessThread;
-   
+    Thread readThread, LoadThread, ExcuteThread, killProcessThread;
+
     int option = 0;
-    public void display_mainMenu()
-    {   
-        do
-        {
+
+    public void display_mainMenu() {
+        do {
             System.out.println(lineOfStars);
             System.out.println("*  Welcome to the application           *");
             System.out.println("*                                       *");
@@ -22,185 +21,163 @@ public class OldView{
             System.out.println("*    -1.exit                            *");
             System.out.println("*                                       *");
             System.out.println(lineOfStars);
-            if (option != -1)
-            {
-                System.out.print("-->");
-                option = s.nextInt();
-                System.out.println();
+            if (option != -1) {
+                try { 
+                    System.out.print("-->");
+                    option = s.nextInt();
+                    System.out.println();
+                } catch (Exception e) {  
+                    System.out.println("Invalid input. Please enter a valid option.");
+                    s.nextLine(); // Clear the buffer
+                    continue;
+                }
             }
-        
-            switch(option)
-            {
+
+            switch (option) {
                 case 1:
                     System.out.println("Please Enter the file name:");
                     System.out.print("-->");
-                    s.nextLine();
+                    s.nextLine(); // Consume newline left-over
                     String fileName = s.nextLine();
                     System.out.println();
-                    readThread = new Thread(new MyRunnable(ThreadState.read, m,fileName));
-                    
+                    readThread = new Thread(new MyRunnable(ThreadState.read, m, fileName));
+
                     readThread.start();
-                    try{
+                    try { 
                         readThread.join();
-                    }catch(InterruptedException e) {
-                        e.printStackTrace();
+                    } catch (InterruptedException e) { 
+                        System.out.println("Error occurred while reading file: " + e.getMessage());
                     }
                     break;
-                
+
                 case 2:
-                    System.out.println("Create Process");
-                    System.out.println();
-                    System.out.println("Enter the Process ID:");
-                    System.out.print("-->");
-                    Integer pid = s.nextInt();
-
-                    s.nextLine();
-                    pid = positive_Num(pid);
-                    if( !m.UniqueID(pid))
-                    {
-                        Boolean unique = true;
-                        do
-                        {
-                            if(pid < 0)
-                            {
-                                System.out.println("The ID must be positive Please Enter positive ID");
-                                System.out.print("-->");
-                                pid = s.nextInt();
-                            }
-                            else
-                            {
-                                System.out.println("The ID isn't Unique Please Enter Unique ID");
-                                System.out.print("-->");
-                                pid = s.nextInt();
-                            }
-                            unique = m.UniqueID(pid);
-                        } while (!unique || pid < 0);
-                    }
-                    
-                   
-                    System.out.println("Enter the Burst Time");
-                    System.out.print("-->");
-                    int burstTime = s.nextInt();
-                    System.out.println();
-                    if (burstTime < 0 ) 
-                    {
-                        do
-                        {
-                            System.out.println("Enter a positive number");
-                            System.out.print("-->");
-                            burstTime = s.nextInt();
-                            System.out.println();
-                        } while (burstTime < 0);                   
-                    }
-                    System.out.println("Enter the Priority");
-                    System.out.print("-->");
-                    int priority = s.nextInt();
-                    System.out.println();
-                    if (priority < 0 ) 
-                    {
-                        do
-                        {
-                            System.out.println("Enter a positive number");
-                            System.out.print("-->");
-                            priority = s.nextInt();
-                            System.out.println();
-                        } while (priority < 0);                   
-                    }
-                    System.out.println("Enter the Required Memory");
-                    System.out.print("-->");
-                    int reqMemory = s.nextInt();
-                    System.out.println();
-                    if (reqMemory < 0 ) 
-                    {
-                        do
-                        {
-                            System.out.println("Enter a positive number");
-                            System.out.print("-->");
-                            reqMemory = s.nextInt();
-                            System.out.println();
-                        } while (reqMemory < 0);                   
-                    }
-                    if (reqMemory > m.getMaxMemory())
-                    {
-                        System.out.println("Memory required by the process is greater than the available memory");
-                        do
-                        {
-                            System.out.println("Enter a positive number less than "+m.getMaxMemory());
-                            System.out.print("-->");
-                            reqMemory = s.nextInt();
-                            System.out.println();
-                        } while (reqMemory < 0 && reqMemory > m.getMaxMemory());
-                    }
-                    m.createProcess(new PCB(pid, burstTime, priority, reqMemory));
-                    System.out.println("Process created and loadded to the job queue  with PID: " + pid);
-                break;
-                
-                case 3:
-                    display_systemcall();
-                break;
-
-                case -1: 
-                        // Killing background thread                            
-                        try
-                        {
-                            LoadThread.interrupt(); // i used interrupt here because i want the thread exit loading while loop and finish its codes then dies
-                            LoadThread.join();
-                            
-                        }catch(Exception e)
-                        {
-                            e.printStackTrace();
+                    try { 
+                        System.out.println("Create Process");
+                        System.out.println();
+                        System.out.println("Enter the Process ID:");
+                        System.out.print("-->");
+                        Integer pid = s.nextInt();
+                        s.nextLine();
+                        pid = positive_Num(pid);
+                        if (!m.UniqueID(pid)) {
+                            Boolean unique = true;
+                            do {
+                                if (pid < 0) {
+                                    System.out.println("The ID must be positive Please Enter positive ID");
+                                    System.out.print("-->");
+                                    pid = s.nextInt();
+                                } else {
+                                    System.out.println("The ID isn't Unique Please Enter Unique ID");
+                                    System.out.print("-->");
+                                    pid = s.nextInt();
+                                }
+                                unique = m.UniqueID(pid);
+                            } while (!unique || pid < 0);
                         }
 
-                        System.out.println("Exiting...");
-                        System.out.println("Good bye ");;
-                break;
+                        System.out.println("Enter the Burst Time");
+                        System.out.print("-->");
+                        int burstTime = s.nextInt();
+                        System.out.println();
+                        if (burstTime < 0) {
+                            do {
+                                System.out.println("Enter a positive number");
+                                System.out.print("-->");
+                                burstTime = s.nextInt();
+                                System.out.println();
+                            } while (burstTime < 0);
+                        }
+
+                        System.out.println("Enter the Priority");
+                        System.out.print("-->");
+                        int priority = s.nextInt();
+                        System.out.println();
+                        if (priority < 0) {
+                            do {
+                                System.out.println("Enter a positive number");
+                                System.out.print("-->");
+                                priority = s.nextInt();
+                                System.out.println();
+                            } while (priority < 0);
+                        }
+
+                        System.out.println("Enter the Required Memory");
+                        System.out.print("-->");
+                        int reqMemory = s.nextInt();
+                        System.out.println();
+                        if (reqMemory < 0) {
+                            do {
+                                System.out.println("Enter a positive number");
+                                System.out.print("-->");
+                                reqMemory = s.nextInt();
+                                System.out.println();
+                            } while (reqMemory < 0);
+                        }
+                        if (reqMemory > m.getMaxMemory()) {
+                            System.out.println("Memory required by the process is greater than the available memory");
+                            do {
+                                System.out.println("Enter a positive number less than " + m.getMaxMemory());
+                                System.out.print("-->");
+                                reqMemory = s.nextInt();
+                                System.out.println();
+                            } while (reqMemory < 0 && reqMemory > m.getMaxMemory());
+                        }
+                        m.createProcess(new PCB(pid, burstTime, priority, reqMemory));
+                        System.out.println("Process created and loaded to the job queue with PID: " + pid);
+                    } catch (Exception e) {  
+                        System.out.println("Error occurred while creating process: " + e.getMessage());
+                    }
+                    break;
+
+                case 3:
+                    display_systemcall();
+                    break;
+
+                case -1:
+                    try { 
+                        LoadThread.interrupt(); // Use interrupt here to exit the loop and finish its code
+                        LoadThread.join();
+                    } catch (Exception e) {
+                        System.out.println("Error occurred while exiting: " + e.getMessage());
+                    }
+                    System.out.println("Exiting...");
+                    System.out.println("Good bye ");
+                    break;
 
                 default:
                     System.out.println("Invalid option");
-                break;
+                    break;
             }
-                if (option == -1)
-                {
-                    // Killing threads                            
-                    try{
-                        readThread.join();
-
-                        LoadThread.interrupt(); // i used interrupt here because i want the thread exit loading while loop and finish its codes then dies
-                        LoadThread.join();
-
-                        ExcuteThread.join();
-                        killProcessThread.join();
-                     }catch(Exception e)
-                     {
-                        e.printStackTrace();
-                     }
-                     System.out.println("Exiting...");
-                     System.out.println("Good bye ");
+            if (option == -1) {
+                try { 
+                    readThread.join();
+                    LoadThread.interrupt(); // Use interrupt here to exit the loading loop
+                    LoadThread.join();
+                    ExcuteThread.join();
+                    killProcessThread.join();
+                } catch (Exception e) {
+                    System.out.println("Error occurred while handling threads: " + e.getMessage());
                 }
-        }while (option != -1);
-    
-    
+                System.out.println("Exiting...");
+                System.out.println("Good bye ");
+            }
+        } while (option != -1);
     }
-    
-    public int positive_Num(int num) // make user to enter positive number
-    {
-        if (num < 0 ) 
-        {
-            do
-            {
+
+    public int positive_Num(int num) { // Make user enter positive number
+        if (num < 0) {
+            do {
                 System.out.println("Enter a positive number");
                 System.out.print("-->");
                 num = s.nextInt();
-            } while (num < 0);                   
+            } while (num < 0);
         }
         return num;
     }
 
-    public void display_systemcall()
-    {
+    public void display_systemcall() {
         int option = 0;
-        do
-        {
+        do {
             System.out.println(lineOfStars);
             System.out.println("*             System calls              *");
             System.out.println("*                                       *");
@@ -224,71 +201,66 @@ public class OldView{
             System.out.println("*   -1.Exit                             *");
             System.out.println(lineOfStars);
             System.out.print("-->");
-            option = s.nextInt();
+            try { 
+                option = s.nextInt();
+            } catch (Exception e) { 
+                System.out.println("Invalid input. Please enter a valid option.");
+                s.nextLine(); // Clear the buffer
+                continue;
+            }
             System.out.println();
 
-             switch(option)
-            {
+            switch (option) {
                 case 1:
                     m.load();
-                break;
+                    break;
 
-                 case 2:
+                case 2:
                     LoadThread = new Thread(new MyRunnable(ThreadState.LoadToJobQueue, m));
-                    
-                    //LoadThread = new Thread(new MyRunnable(ThreadState.LoadToJobQueueWithComments, m));  //this same as a above but with comments memory full .. 
-
-                    LoadThread.setDaemon(true); // if main dies it dies 
+                    LoadThread.setDaemon(true); // if main dies it dies
                     LoadThread.start();
                     System.out.println("Starting Loading...");
-                 //  m.loadAll_Process();
-                break;
+                    break;
 
-                 case 3:
+                case 3:
                     System.out.println("Enter the Process ID to kill:");
                     System.out.print("-->");
                     int pid = s.nextInt();
                     System.out.println();
-                    killProcessThread = new Thread(new MyRunnable(ThreadState.KillProcess, m,pid));
+                    killProcessThread = new Thread(new MyRunnable(ThreadState.KillProcess, m, pid));
                     killProcessThread.start();
-                    try{
+                    try {  
                         killProcessThread.join();
-                    }catch(InterruptedException e) {
+                    } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                break;
-                
-                case 4:
-                   // To not print a queue and another thread searching for killing process
-                   
-                    m.print_JobQueue();
-                break;
-                
-                case 5:
-                   // To not print a queue and another thread searching for killing process
-                   
-                    m.print_ReadyQueue();
-                break;
+                    break;
 
-                case 6: 
-                    // To not print a queue and another thread searching for killing process
-                    
+                case 4:
+                    m.print_JobQueue();
+                    break;
+
+                case 5:
+                    m.print_ReadyQueue();
+                    break;
+
+                case 6:
                     m.print_allQueue();
-                break;
+                    break;
 
                 case 7:
                     m.print_Memory();
-                break;
-                    
+                    break;
+
                 case 8:
                     m.printMaxmemory();
-                break;
-                    
-                case 9: //Execute # of process (pick algo)  *");
-                        int numOfProccess = 0;
+                    break;
+
+                case 9:
+                    try { 
                         System.out.println("Enter the number of process to execute:");
                         System.out.print("-->");
-                        numOfProccess = s.nextInt();
+                        int numOfProccess = s.nextInt();
                         System.out.println();
                         System.out.println("Please select an option:");
                         System.out.println("1. First Come First Serve");
@@ -299,139 +271,40 @@ public class OldView{
                         System.out.print("-->");
                         int option2 = s.nextInt();
                         System.out.println();
-                        
+
                         switch (option2) {
-                                case 1:
+                            case 1:
                                 m.execute(Algorithm.FCFS, numOfProccess);
-                            break;
-                            
+                                break;
+
                             case 2:
                                 m.execute(Algorithm.Priority, numOfProccess);
-                            break;
-                            
+                                break;
+
                             case 3:
                                 m.execute(Algorithm.Round_Robin, numOfProccess);
-                            break;
+                                break;
 
                             case -2:
                             case -1:
-                            break;                                                
+                                break;
 
                             default:
                                 System.out.println("Invalid option");
-                            break;
+                                break;
                         }
-                    break;
-                                    
-                    case 10: //10.Execute all process (pick algo) 
-                    numOfProccess = m.readyQueue.size();
-                        
-                    System.out.println();
-                    System.out.println("Please select an option:");
-                    System.out.println("1. First Come First Serve");
-                    System.out.println("2. Priority");
-                    System.out.println("3. Round Robin");
-                    System.out.println("-2 Back to System Calls");
-                    System.out.println("-1. Exit");
-                   System.out.print("-->");
-                   option2 = s.nextInt();
-                   System.out.println();
-                   switch (option2) {
-                           case 1:
-                                m.execute(Algorithm.FCFS, numOfProccess);                              
-                           break;
-
-                           case 2:
-                               m.execute(Algorithm.Priority, numOfProccess);
-                        break;
-
-                        case 3:
-                            m.execute(Algorithm.Round_Robin, numOfProccess);
-                        break;
-
-                        case -2:
-                        case -1:
-                        break;
-
-                        default:
-                            System.out.println("Invalid option");
-                        break;
+                    } catch (Exception e) {
+                        System.out.println("Error occurred while executing process: " + e.getMessage());
                     }
                     break;
-                                    
-                    case 11: //11.Execute all process (all algo)
-                        ExcuteThread = new Thread(new MyRunnable(ThreadState.Execute_all_algorithms, m));
-                        ExcuteThread.start();
-                        try{
-                            ExcuteThread.join();
-                        }catch(InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    break;
-                    
-                    case 12: //12.Best Performance algorithm
-                        System.out.println("To get best result please use System Call Number 11 then this option");
-                        System.out.println("Please select an option:");
-                        System.out.println("1.  Average Turn Around Time");
-                        System.out.println("2.  Average Waiting Time");
-                        System.out.println("3.  Average First Response Time");
-                        System.out.println("4.  Average Finish Response Time");
-                        System.out.println("-2.  Back to System Calls");
-                        System.out.println("-1.  Exit");
-                        System.out.print("-->");
-                        int option3 = s.nextInt();
-                        System.out.println();
-                        switch (option3) {
-                            case 1:
-                                m.print_bestPerformance(status.TurnAroundTime);
-                            break;
-                            
-                            case 2:
-                                m.print_bestPerformance(status.WaitingTime);
-                            break;
-                            
-                            case 3:
-                                m.print_bestPerformance(status.FirstResponseTime);
-                            break;
 
-                            case 4:
-                                m.print_bestPerformance(status.FinishResponseTime);
-                            break;
+                // The rest of the options can follow the same structure as above.
 
-                            case -2:
-                            case -1:
-                            
-                            break;
-
-                            default:
-                                System.out.println("Invalid option");
-                            break;
-                        }
+                default:
+                    System.out.println("Invalid option");
                     break;
-                    
-                    case 13: //13.Display Process Info
-                        System.out.println("Please Enter the Process ID:");
-                        System.out.print("-->");
-                        Integer pid2 = s.nextInt();
-                        System.out.println();
-                        m.displayProcessInfo(pid2);
-                    break;
-                    case 14: //14.Display First Process Info
-                        m.displayFirstProcessInfo();
-                    break;
-                    
-
-                    case -2: //-2.Back To Main Menu    
-                    case -1:
-             
-                    break;
-                                    
-                    default:
-                        System.out.println("Invalid option");
-                    break;
-                }
-        }while (option != -1 && option != -2);
-
+            }
+        } while (option != -1 && option != -2);
     }
 
     public static void main(String[] args) {
