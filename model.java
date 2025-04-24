@@ -7,8 +7,7 @@ public class model implements SystemCalls
     Queue<PCB> readyQueue = new LinkedList<PCB>();
     Queue<PCB> JobQueue = new LinkedList<PCB>();
     performance p1 ,p2 ,p3;
-
-
+ 
     private int currentmemory = 2048;
     private final int MaxMemory;
 
@@ -118,7 +117,7 @@ public class model implements SystemCalls
             return;
         }
         pcb.setState(State.READY);
-        readyQueue.add(pcb);
+        addToReadyQueue(pcb);
         System.out.println("Process loaded with PID: " + pcb.getId());
     }
     public void loadAll_Process()
@@ -133,10 +132,11 @@ public class model implements SystemCalls
     {
         if (this.JobQueue.isEmpty())
         {
-           // System.out.println("empty");
-            //System.out.println("Job Queue is empty");
-            try {
-                Thread.currentThread().sleep(100);                
+            // System.out.println("empty");
+            System.out.println("Job Queue is empty");
+           try {
+               Thread.currentThread().sleep(500); 
+
             } catch (Exception e) {
 
             }
@@ -149,7 +149,7 @@ public class model implements SystemCalls
             return;
         }
         pcb.setState(State.READY);
-        readyQueue.add(pcb);
+        addToReadyQueue(pcb);
         //System.out.println("Process loaded with PID: " + pcb.getId());
     }
     public void loadAll_ProcessWithoutPrinting()
@@ -377,19 +377,25 @@ public class model implements SystemCalls
     }
     public PCB pollReadyQueue(){
         PCB pcb = readyQueue.poll();
-        if (pcb == null)
-        {
-            while (pcb == null) {
-                try {
-                    Thread.currentThread().sleep(1000);
-                } catch (Exception e) {
-                    break;
-                }   
-                load();
-                pcb = readyQueue.poll();   
+        while (pcb == null && !readyQueue.isEmpty()) {
+            pcb = readyQueue.poll();
+        }
+        return pcb; 
+    }
+    public void addToReadyQueue(PCB pcb){
+        if (pcb != null) {
+            readyQueue.add(pcb);
+        }
+    }
+    public void removeNullsFromReadyQueue() {
+        Queue<PCB> temp = new LinkedList<>();
+        for (PCB pcb : readyQueue) {
+            if (pcb != null) {
+                temp.add(pcb);
             }
         }
-        return pcb;   
+        readyQueue.clear();
+        readyQueue.addAll(temp);
     }
 }
 

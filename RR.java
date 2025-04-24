@@ -146,6 +146,7 @@ public class RR {
             
                 }
             public void RRsechduala(int quantum) {
+                m.removeNullsFromReadyQueue();
 
                     long time = 0; // This is waiting time in queue set for each process                     
                     Queue<PCB> RunningQueue = m.readyQueue;

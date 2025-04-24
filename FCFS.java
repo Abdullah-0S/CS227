@@ -16,6 +16,7 @@ public class FCFS {
 
     public void schedule(Queue<PCB> readyQueue, Queue<PCB> jobQueue) 
     {
+        systemModel.removeNullsFromReadyQueue();
         clearEachSteps();
         clearFinishedQueue();
         

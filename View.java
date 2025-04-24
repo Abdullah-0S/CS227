@@ -6,7 +6,7 @@ public class View
     
     model m = new model(2048); // Here to change Memory 
     
-    String fileName = "random.txt"; //This is File Name 
+    String fileName = "job.txt"; //This is File Name 
     
     //Thread LoadThread = new Thread(new MyRunnable(ThreadState.LoadToJobQueue, m));               
     Thread LoadThread = new Thread(new MyRunnable(ThreadState.LoadToJobQueueWithComments, m));  //this same as a above but with comments memory full .. 
@@ -43,9 +43,14 @@ public class View
                 case 1: 
                     //FCFS
                     FCFS fcfs = new FCFS(m);
-                    fcfs.schedule(m.readyQueue,m.JobQueue);
-
-                    fcfs.printGantChart(); // print gantChart
+                
+                    Thread runFCFS = new Thread(new MyRunnable(ThreadState.Execute_FCFS, m,fcfs));
+                    runFCFS.start();
+                    try {
+                        runFCFS.join();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
 
                     performance p = new performance(Algorithm.FCFS,fcfs.getFinishedQueue());
                     System.out.println(p); // Print performance of a algorithm such as AvgTurnaround , AvgWaitingTime..
@@ -53,9 +58,18 @@ public class View
                 break;
 
                 case 2: //Priorty //TODO:
-                //    Priorty pq = new Priorty(m);
-                // pq.PQ(m.readyQueue, m.JobQueue);
-                   // pq.printGantChart();
+                    Priorty pq = new Priorty(m);
+
+                    Thread runPQ = new Thread(new MyRunnable(ThreadState.Execute_PQ, m,pq));
+                    runPQ.start();
+                    try {
+                        runPQ.join();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    performance p2 = new performance(Algorithm.Priority,pq.getFinishedQueue());
+                    System.out.println(p2); // Print performance of a algorithm such as AvgTurnaround , AvgWaitingTime..
                 break;
 
                 case 3://Rouund Roubin
@@ -81,6 +95,7 @@ public class View
  
                 case 4://Print best
                 //RUN 1 ,2 ,3 AND THEN USE PERFORMANCE
+                System.out.println(m.readyQueue.size());
                 m.print_allQueue();
 
                 break;

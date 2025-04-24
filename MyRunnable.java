@@ -6,6 +6,8 @@ public class MyRunnable implements Runnable {
     private int killProcessWithPid;
     private String fileName;
     private RR rr;
+    private Priorty pq;
+    private FCFS fcfs;
     private int quantum;
     
     public MyRunnable(ThreadState state, model model){
@@ -17,6 +19,16 @@ public class MyRunnable implements Runnable {
         m = model;
         this.rr = rr;
         this.quantum = quantum;
+    }
+    public MyRunnable(ThreadState state, model model,Priorty pq){
+        this.state = state;
+        m = model;
+        this.pq = pq;
+    }
+    public MyRunnable(ThreadState state, model model, FCFS fcfs){
+        this.state = state;
+        m = model;
+        this.fcfs = fcfs;
     }
     
     public MyRunnable(ThreadState state, model m, int killProcessWithPid) {
@@ -83,7 +95,10 @@ public class MyRunnable implements Runnable {
                   while(!Thread.currentThread().isInterrupted())
                   {
                     try{
-                       // Thread.sleep(000); 
+                       // Thread.sleep(000);
+                    //    Thread.sleep(500);
+                    //    System.out.println("Trying to load"); 
+                       System.out.println(m.JobQueue.size()); 
                         m.loadWithoutPrinting();
                     }catch(Exception e)
                     {
@@ -97,8 +112,12 @@ public class MyRunnable implements Runnable {
                   while(!Thread.currentThread().isInterrupted())
                   {
                     try{
-                        //Thread.sleep(4000); 
-                        m.loadWithoutPrinting();
+                        //Thread.sleep(4000);
+                        
+                    //    Thread.sleep(500);
+                    //    System.out.println("Trying to load");
+                    //    System.out.println(m.JobQueue.size()); 
+                       m.loadWithoutPrinting();
                     }catch(Exception e)
                     {
                         break;                   
@@ -115,9 +134,19 @@ public class MyRunnable implements Runnable {
                 m.killProcess(killProcessWithPid);
             break;
             case Execute_RR:
-            rr.RRsechduala(quantum);
-            System.out.println("Out");
-            rr.printGantChart(); // print gantChart
+                rr.RRsechduala(quantum);
+                rr.printGantChart(); // print gantChart
+            break;
+
+            case Execute_FCFS:
+                fcfs.schedule(m.readyQueue,m.JobQueue);
+
+                fcfs.printGantChart(); // print gantChart
+            break;
+
+            case Execute_PQ:
+                pq.PQ();
+                pq.printGantChart();
             break;
         }  
     }
@@ -129,5 +158,7 @@ enum ThreadState
     LoadToJobQueueWithComments,
     Execute_all_algorithms,
     KillProcess,
-    Execute_RR
+    Execute_RR,
+    Execute_FCFS,
+    Execute_PQ
 }

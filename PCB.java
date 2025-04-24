@@ -8,6 +8,8 @@ public class PCB implements Comparable<PCB> {
     private long FinishTime; 
     private long FirstResponseTime; 
     private long WaitingTime;
+    private int requiredCount; // This for priorty this process shall be finished in requiredCount if not there has been starvation
+
 
     public PCB(int pid, int burstTime, int priority ,int reqMemory) {
         this.id = pid;
@@ -16,6 +18,8 @@ public class PCB implements Comparable<PCB> {
         this.reqMemory = reqMemory;
         
         this.FirstResponseTime = -1; // to know if the process has not executed
+        this.requiredCount = -1; // to know if the process has not executed
+
     }
     public PCB(int variables[])
     {
@@ -25,6 +29,7 @@ public class PCB implements Comparable<PCB> {
         this.reqMemory = variables[3];
         
         this.FirstResponseTime = -1; // to know if the process has not executed
+        this.requiredCount = -1; // to know if the process has not executed
 
     }
     public PCB(PCB pcb)
@@ -38,6 +43,7 @@ public class PCB implements Comparable<PCB> {
         this.FinishTime = pcb.FinishTime;
         this.FirstResponseTime = pcb.FirstResponseTime;
         this.WaitingTime = pcb.WaitingTime;
+        this.requiredCount = pcb.requiredCount;
     }
 
     public int getId() {
@@ -102,7 +108,13 @@ public class PCB implements Comparable<PCB> {
     public void setPriority(int priority) {
         this.priority = priority;
     }
-
+    public void setRequiredCount(int requiredCount)
+    {
+        this.requiredCount = requiredCount;
+    }
+    public int getRequiredCount(){
+        return requiredCount;
+    }
     
     @Override
     public String toString() {
@@ -111,8 +123,13 @@ public class PCB implements Comparable<PCB> {
                 + WaitingTime + ", priority=" + priority + "]";
     }
 
-    @Override // For Priorty Schduling
+    
+    // For Priority Scheduling
+    @Override 
     public int compareTo(PCB other) {
+        if (other == null) {
+            return -1; // Non-null is "less than" null (nulls last)
+        }
         if (this.priority == other.priority) {
             return Integer.compare(this.id, other.id); // FIFO order for same priority
         }
