@@ -1,7 +1,6 @@
 import java.util.Scanner;
 
-public class View 
-{
+public class View {
     Scanner scanner = new Scanner(System.in);
     
     model m = new model(2048); // Here to change Memory 
@@ -12,10 +11,9 @@ public class View
     Thread LoadThread = new Thread(new MyRunnable(ThreadState.LoadToJobQueueWithComments, m));  //this same as a above but with comments memory full .. 
 
     boolean AutoFill = true; 
-    boolean WaitUntilFinishReading = true ;
+    boolean WaitUntilFinishReading = true;
 
-    public void menu()
-    {
+    public void menu() {
         // Read and Create a process from a file
         runReadThreadIfQueuesEmpty();
             
@@ -25,26 +23,31 @@ public class View
         System.out.println("Starting Loading...");   
 
         int option = 0;
-        do
-        {
+        do {
             display_mainMenu();
-            option = scanner.nextInt();
+            try { 
+                option = scanner.nextInt();
+            } catch (Exception e) {
+                System.out.println("Invalid input. Please enter a valid option.");
+                scanner.nextLine(); // Clear the buffer
+                continue;
+            }
             System.out.println();
             if (option != -1)
                 runReadThreadIfQueuesEmpty();
             HoldUntilFinish();
             System.out.println();
             try {
-                Thread.sleep(125);
+                Thread.sleep(125); 
             } catch (Exception e) {
+                e.printStackTrace();
             }
-            switch (option) 
-            {
+            switch (option) {
                 case 1: 
                     //FCFS
                     FCFS fcfs = new FCFS(m);
                 
-                    Thread runFCFS = new Thread(new MyRunnable(ThreadState.Execute_FCFS, m,fcfs));
+                    Thread runFCFS = new Thread(new MyRunnable(ThreadState.Execute_FCFS, m, fcfs));
                     runFCFS.start();
                     try {
                         runFCFS.join();
@@ -52,7 +55,7 @@ public class View
                         e.printStackTrace();
                     }
 
-                    performance p = new performance(Algorithm.FCFS,fcfs.getFinishedQueue());
+                    performance p = new performance(Algorithm.FCFS, fcfs.getFinishedQueue());
                     System.out.println(p); // Print performance of a algorithm such as AvgTurnaround , AvgWaitingTime..
 
                 break;
@@ -60,28 +63,28 @@ public class View
                 case 2: //Priorty //TODO:
                     Priorty pq = new Priorty(m);
 
-                    Thread runPQ = new Thread(new MyRunnable(ThreadState.Execute_PQ, m,pq));
+                    Thread runPQ = new Thread(new MyRunnable(ThreadState.Execute_PQ, m, pq));
                     runPQ.start();
-                    try {
+                    try { // إضافة try-catch حول تنفيذ الخيط
                         runPQ.join();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
 
-                    performance p2 = new performance(Algorithm.Priority,pq.getFinishedQueue());
+                    performance p2 = new performance(Algorithm.Priority, pq.getFinishedQueue());
                     System.out.println(p2); // Print performance of a algorithm such as AvgTurnaround , AvgWaitingTime..
                 break;
 
-                case 3://Rouund Roubin
+                case 3://Round Robin
                     //getting quantum time
                     System.out.println("Enter the quantum time: ");
                     System.out.print("-->");
                     int quantum = scanner.nextInt();                   
                     
                     RR rr = new RR(m);
-                    Thread runRR = new Thread(new MyRunnable(ThreadState.Execute_RR, m,rr,quantum));
+                    Thread runRR = new Thread(new MyRunnable(ThreadState.Execute_RR, m, rr, quantum));
                     runRR.start();
-                    try {
+                    try { 
                         runRR.join();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -89,7 +92,6 @@ public class View
 
                     performance p3 = new performance(Algorithm.Round_Robin, rr.getFinishedQueue());
                     System.out.println(p3); // Print performance of a algorithm such as AvgTurnaround , AvgWaitingTime..
-                    
                     
                 break;
  
@@ -101,31 +103,31 @@ public class View
                 break;
                 case -1:
                     System.out.println("Exiting...");
-                    LoadThread.interrupt();
+                    LoadThread.interrupt();  
                 break;
 
                 default:
 
                 break;
             }
-        }while(option != -1);
+        } while (option != -1);
     }
 
-    public void display_mainMenu()
-    {
+    public void display_mainMenu() {
         System.out.println();
         System.out.println( "* * * * * * * * * * * * * * *");
         System.out.println("*          Welcome          *");
         System.out.println("*  Please select an option: *");
         System.out.println("*    1.FCFS                 *"); // process
         System.out.println("*    2.Priorty              *");
-        System.out.println("*    3.Round Roubin         *");
+        System.out.println("*    3.Round Robin          *");
         System.out.println("*    4.Best Status          *");
         System.out.println("*    -1.Exit                *");
         System.out.println( "* * * * * * * * * * * * * * *");
         System.out.println();
         System.out.print("-->");
     }
+
     private void runReadThreadIfQueuesEmpty() {
         if (AutoFill && m.CanFill()) {
             WaitUntilFinishReading = true;
@@ -134,24 +136,19 @@ public class View
                 Thread readThread = new Thread(new MyRunnable(ThreadState.read, m, fileName));
                 readThread.start();
                 readThread.join();
-            } catch(Exception e) {
+            } catch(Exception e) {  
                 e.printStackTrace();
             } 
             System.out.println("Job Queue Fulled");
             WaitUntilFinishReading = false;
         }
     }
-    private void HoldUntilFinish()
-    {
-        while(WaitUntilFinishReading)
-        {
+
+    private void HoldUntilFinish() {
+        while(WaitUntilFinishReading) {
             ;
         }
     }
-
-
-
-
 
     public static void main(String[] args) {
         View v = new View();
