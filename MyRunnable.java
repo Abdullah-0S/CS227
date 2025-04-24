@@ -5,10 +5,18 @@ public class MyRunnable implements Runnable {
     private model m;
     private int killProcessWithPid;
     private String fileName;
+    private RR rr;
+    private int quantum;
     
     public MyRunnable(ThreadState state, model model){
         this.state = state;
         m = model;
+    }
+    public MyRunnable(ThreadState state, model model,RR rr, int quantum){
+        this.state = state;
+        m = model;
+        this.rr = rr;
+        this.quantum = quantum;
     }
     
     public MyRunnable(ThreadState state, model m, int killProcessWithPid) {
@@ -75,9 +83,9 @@ public class MyRunnable implements Runnable {
                   while(!Thread.currentThread().isInterrupted())
                   {
                     try{
-                        Thread.sleep(000); 
-                        m.loadAll_ProcessWithoutPrinting();
-                    }catch(InterruptedException e)
+                       // Thread.sleep(000); 
+                        m.loadWithoutPrinting();
+                    }catch(Exception e)
                     {
                         break;                   
                     }
@@ -89,9 +97,9 @@ public class MyRunnable implements Runnable {
                   while(!Thread.currentThread().isInterrupted())
                   {
                     try{
-                        Thread.sleep(4000); 
-                        m.loadAll_Process();
-                    }catch(InterruptedException e)
+                        //Thread.sleep(4000); 
+                        m.loadWithoutPrinting();
+                    }catch(Exception e)
                     {
                         break;                   
                     }
@@ -106,6 +114,11 @@ public class MyRunnable implements Runnable {
             case KillProcess:
                 m.killProcess(killProcessWithPid);
             break;
+            case Execute_RR:
+            rr.RRsechduala(quantum);
+            System.out.println("Out");
+            rr.printGantChart(); // print gantChart
+            break;
         }  
     }
 }
@@ -115,5 +128,6 @@ enum ThreadState
     LoadToJobQueue,
     LoadToJobQueueWithComments,
     Execute_all_algorithms,
-    KillProcess
+    KillProcess,
+    Execute_RR
 }

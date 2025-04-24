@@ -2,7 +2,6 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.Scanner;
 public class model implements SystemCalls
 {
     Queue<PCB> readyQueue = new LinkedList<PCB>();
@@ -26,6 +25,8 @@ public class model implements SystemCalls
 
     public void createProcess(PCB pcb) // create Process and add it to the Job Queue
     {
+        if (pcb == null )
+            return;
         if (!UniqueID(pcb.getId()))
         {
             System.out.println("Process with PID: " + pcb.getId() + " already exists");
@@ -69,6 +70,8 @@ public class model implements SystemCalls
         for (int i = 0; i < JobQueue.size(); i++)
         {
             e = JobQueue.poll();
+            if (e == null)
+                continue;
             if (ID == e.getId()) 
                 Unique = false;
             JobQueue.add(e);            
@@ -128,9 +131,15 @@ public class model implements SystemCalls
     }
     public void loadWithoutPrinting() // load the process from the job queue to the ready queue
     {
-        if (JobQueue.isEmpty())
+        if (this.JobQueue.isEmpty())
         {
+           // System.out.println("empty");
             //System.out.println("Job Queue is empty");
+            try {
+                Thread.currentThread().sleep(100);                
+            } catch (Exception e) {
+
+            }
             return;
         }
         PCB pcb = JobQueue.poll();
@@ -159,7 +168,7 @@ public class model implements SystemCalls
             return -1;
         }
         currentmemory -= pcb.getReqMemory();
-        //System.out.println("Memory allocated to process with PID: " + pcb.getId()+ " Memory left: " + currentmemory);
+        // System.out.println("Memory allocated to process with PID: " + pcb.getId()+ " Memory left: " + currentmemory);
         return 0;
     } 
 
@@ -167,7 +176,8 @@ public class model implements SystemCalls
     {
         List<PCB> process= readFile.read_returnPcbs(filePath);
         for (PCB pcb : process) {
-            createProcess(pcb);
+            if (pcb != null)
+                createProcess(pcb);
         }
     }
 
@@ -194,71 +204,71 @@ public class model implements SystemCalls
     
     public void execute(Algorithm algo, int numOfProccess)
     {
-        if (readyQueue.isEmpty())
-        {
-            System.out.println("ready queue is empty");
-            return;
-        }
-        if (readyQueue.size() < numOfProccess)
-        {
-            System.out.println("Not enough processes in the ready queue , only " + readyQueue.size() + " processes are available");
-            return;
-        }
-        if (algo == Algorithm.All)
-        {
-            numOfProccess = readyQueue.size();
-        }
+        // if (readyQueue.isEmpty())
+        // {
+        //     System.out.println("ready queue is empty");
+        //     return;
+        // }
+        // if (readyQueue.size() < numOfProccess)
+        // {
+        //     System.out.println("Not enough processes in the ready queue , only " + readyQueue.size() + " processes are available");
+        //     return;
+        // }
+        // if (algo == Algorithm.All)
+        // {
+        //     numOfProccess = readyQueue.size();
+        // }
 
-        switch (algo) 
-        {
-            case FCFS:
-                FCFS fcfs = new FCFS(this);
-                //p1 = new performance(Algorithm.FCFS,fcfs.schedule(readyQueue , numOfProccess));
-                System.out.println(p1);  
-            break;
-            case Round_Robin:
-                System.out.println("Enter the quantum time: ");
-                System.out.print("-->");
-                Scanner s = new Scanner(System.in);
-                int quantum = s.nextInt();
-                p2 = new performance(Algorithm.Round_Robin, RR.RRsechdual(readyQueue, numOfProccess, quantum));
-                System.out.println(p2);
-                break;
+        // switch (algo) 
+        // {
+        //     case FCFS:
+        //         // FCFS fcfs = new FCFS(this);
+        //         //p1 = new performance(Algorithm.FCFS,fcfs.schedule(readyQueue , numOfProccess));
+        //         System.out.println(p1);  
+        //     break;
+        //     case Round_Robin:
+        //         System.out.println("Enter the quantum time: ");
+        //         System.out.print("-->");
+        //         Scanner s = new Scanner(System.in);
+        //         int quantum = s.nextInt();
+        //         // p2 = new performance(Algorithm.Round_Robin, RR.RRsechdual(readyQueue, numOfProccess, quantum));
+        //         System.out.println(p2);
+        //         break;
 
-            case Priority:
-                Priorty priorty = new Priorty(this);
-                //p3 = new performance(Algorithm.Priority, priorty.PQ(readyQueue, numOfProccess));
-                System.out.println(p3);
-            break;
+        //     case Priority:
+        //         Priorty priorty = new Priorty(this);
+        //         //p3 = new performance(Algorithm.Priority, priorty.PQ(readyQueue, numOfProccess));
+        //         System.out.println(p3);
+        //     break;
 
-            case All:
-            // asking user to get the quantum for RR algo
-            System.out.println("Enter the quantum time: ");
-            System.out.print("-->");
-            Scanner s1 = new Scanner(System.in);
-            int quantum1 = s1.nextInt();
+        //     case All:
+        //     // asking user to get the quantum for RR algo
+        //     System.out.println("Enter the quantum time: ");
+        //     System.out.print("-->");
+        //     Scanner s1 = new Scanner(System.in);
+        //     int quantum1 = s1.nextInt();
 
-            numOfProccess = readyQueue.size();
+        //     numOfProccess = readyQueue.size();
 
-            // we used copy ready queue here becuase i dont want the original ready queue being altered
-            p2 = new performance(Algorithm.Round_Robin, RR.RRsechdualWithoutFree(copy(readyQueue),numOfProccess, quantum1));
-            System.out.println(p2);
+        //     // we used copy ready queue here becuase i dont want the original ready queue being altered
+        //     // p2 = new performance(Algorithm.Round_Robin, RR.RRsechdualWithoutFree(copy(readyQueue),numOfProccess, quantum1));
+        //     System.out.println(p2);
             
-            FCFS fcfs1 = new FCFS(this);
-            // we used copy ready queue here becuase i dont want the original ready queue being altered
-            p1 = new performance(Algorithm.FCFS, fcfs1.scheduleWithoutFree(copy(readyQueue),numOfProccess ));
-            System.out.println(p1);  
+        //     FCFS fcfs1 = new FCFS(this);
+        //     // we used copy ready queue here becuase i dont want the original ready queue being altered
+        //     p1 = new performance(Algorithm.FCFS, fcfs1.scheduleWithoutFree(copy(readyQueue),numOfProccess ));
+        //     System.out.println(p1);  
         
             
-            // We used normal ready queue here because after executing this method readyqueue will be empty 
-            Priorty priorty1 = new Priorty(this);
-            //p3 = new performance(Algorithm.Priority, priorty1.PQ(readyQueue, numOfProccess));
-            System.out.println(p3);
-            break;
+        //     // We used normal ready queue here because after executing this method readyqueue will be empty 
+        //     Priorty priorty1 = new Priorty(this);
+        //     //p3 = new performance(Algorithm.Priority, priorty1.PQ(readyQueue, numOfProccess));
+        //     System.out.println(p3);
+        //     break;
 
-            default:
-                break;
-        }
+        //     default:
+        //         break;
+        // }
   
     }
     public void print_bestPerformance(status s)
@@ -361,7 +371,28 @@ public class model implements SystemCalls
             System.out.println("Ready Queue is Empty");
         }
    }
+    public boolean CanFill()
+    {
+        return (this.readyQueue.isEmpty()&& this.JobQueue.isEmpty());
+    }
+    public PCB pollReadyQueue(){
+        PCB pcb = readyQueue.poll();
+        if (pcb == null)
+        {
+            while (pcb == null) {
+                try {
+                    Thread.currentThread().sleep(1000);
+                } catch (Exception e) {
+                    break;
+                }   
+                load();
+                pcb = readyQueue.poll();   
+            }
+        }
+        return pcb;   
+    }
 }
+
 enum Algorithm
 {
     FCFS, Round_Robin, Priority,All;

@@ -6,22 +6,19 @@ public class View
     
     model m = new model(2048); // Here to change Memory 
     
-    
     String fileName = "random.txt"; //This is File Name 
-    Thread readThread = new Thread(new MyRunnable(ThreadState.read, m ,fileName));
-    Thread LoadThread = new Thread(new MyRunnable(ThreadState.LoadToJobQueue, m));               
-    //Thread LoadThread = new Thread(new MyRunnable(ThreadState.LoadToJobQueueWithComments, m));  //this same as a above but with comments memory full .. 
+    
+    //Thread LoadThread = new Thread(new MyRunnable(ThreadState.LoadToJobQueue, m));               
+    Thread LoadThread = new Thread(new MyRunnable(ThreadState.LoadToJobQueueWithComments, m));  //this same as a above but with comments memory full .. 
 
+    boolean AutoFill = true; 
+    boolean WaitUntilFinishReading = true ;
 
     public void menu()
     {
-        // Create a process from a file
-        readThread.start();
-        try{
-        readThread.join();
-        }catch(InterruptedException e) {
-        e.printStackTrace();
-        }
+        // Read and Create a process from a file
+        runReadThreadIfQueuesEmpty();
+            
         //Auto Load Thread from job Queue to ready Queue
         LoadThread.setDaemon(true); // if main dies it dies 
         LoadThread.start();
@@ -33,9 +30,18 @@ public class View
             display_mainMenu();
             option = scanner.nextInt();
             System.out.println();
+            if (option != -1)
+                runReadThreadIfQueuesEmpty();
+            HoldUntilFinish();
+            System.out.println();
+            try {
+                Thread.sleep(125);
+            } catch (Exception e) {
+            }
             switch (option) 
             {
-                case 1: //FCFS
+                case 1: 
+                    //FCFS
                     FCFS fcfs = new FCFS(m);
                     fcfs.schedule(m.readyQueue,m.JobQueue);
 
@@ -48,20 +54,39 @@ public class View
 
                 case 2: //Priorty //TODO:
                 //    Priorty pq = new Priorty(m);
-// pq.PQ(m.readyQueue, m.JobQueue);
+                // pq.PQ(m.readyQueue, m.JobQueue);
                    // pq.printGantChart();
                 break;
 
                 case 3://Rouund Roubin
-                //TODO:
+                    //getting quantum time
+                    System.out.println("Enter the quantum time: ");
+                    System.out.print("-->");
+                    int quantum = scanner.nextInt();                   
+                    
+                    RR rr = new RR(m);
+                    Thread runRR = new Thread(new MyRunnable(ThreadState.Execute_RR, m,rr,quantum));
+                    runRR.start();
+                    try {
+                        runRR.join();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    performance p3 = new performance(Algorithm.Round_Robin, rr.getFinishedQueue());
+                    System.out.println(p3); // Print performance of a algorithm such as AvgTurnaround , AvgWaitingTime..
+                    
+                    
                 break;
  
                 case 4://Print best
                 //RUN 1 ,2 ,3 AND THEN USE PERFORMANCE
-                break;
+                m.print_allQueue();
 
+                break;
                 case -1:
-                    // KILL THREADS BEFORE
+                    System.out.println("Exiting...");
+                    LoadThread.interrupt();
                 break;
 
                 default:
@@ -85,6 +110,28 @@ public class View
         System.out.println( "* * * * * * * * * * * * * * *");
         System.out.println();
         System.out.print("-->");
+    }
+    private void runReadThreadIfQueuesEmpty() {
+        if (AutoFill && m.CanFill()) {
+            WaitUntilFinishReading = true;
+            System.out.println("Start Reading file");
+            try {
+                Thread readThread = new Thread(new MyRunnable(ThreadState.read, m, fileName));
+                readThread.start();
+                readThread.join();
+            } catch(Exception e) {
+                e.printStackTrace();
+            } 
+            System.out.println("Job Queue Fulled");
+            WaitUntilFinishReading = false;
+        }
+    }
+    private void HoldUntilFinish()
+    {
+        while(WaitUntilFinishReading)
+        {
+            ;
+        }
     }
 
 

@@ -1,7 +1,6 @@
 // This interface will have all the system calls Change the return type if needed
 
 import java.io.IOException;
-import java.util.List;
 
 public interface SystemCalls 
 {

@@ -1,5 +1,4 @@
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.LinkedList;
@@ -18,6 +17,7 @@ public class readFile {
                 if (line.trim().isEmpty() ) {
                     continue;
                 }
+                if (!line.contains(";")){System.out.println("skip line not same pattern"); continue;}
                                                         // 1:2:3:4;1024
                 String[] parts = line.split(";"); // { 1:2:3:4 , 1024 }
                 
@@ -41,34 +41,13 @@ public class readFile {
     }
     public static List<PCB> read_returnPcbs(String filePath) throws IOException
     {
-        List<PCB> list = new LinkedList<>();
-        list.clear();
-        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                if (line.trim().isEmpty() ) {
-                    continue;
-                }
-                                                        // 1:2:3:4;1024
-                String[] parts = line.split(";"); // { 1:2:3:4 , 1024 }
-                
-                String[] values = parts[0].split(":"); // { 1, 2 ,3 ,4}
-                
-                int pid = Integer.parseInt(values[0]);
-                int burstTime_In_ms = Integer.parseInt(values[1]);
-                int priority = Integer.parseInt(values[2]);
-                int reqMemory = Integer.parseInt(parts[1]);
-
-                list.add(new PCB (new int[] {pid, burstTime_In_ms, priority, reqMemory}) );
-
+        List<int[]> list = read(filePath);
+        List<PCB> PcbList = new LinkedList<PCB>();
+            for (int[] pcb : list)
+            {   
+                PcbList.add(new PCB(pcb));
             }
-        }
-        catch (IOException e) 
-        {
-            System.out.println("Error in reading the file");
-        
-        }
-        return list; 
+        return PcbList; 
     } 
 // Testing
     public static void main(String[] args) {
