@@ -134,7 +134,7 @@ public class model implements SystemCalls
             // System.out.println("empty");
             //System.out.println("Job Queue is empty");
            try {
-               Thread.currentThread().sleep(500); 
+               Thread.sleep(500); 
 
             } catch (Exception e) {
 

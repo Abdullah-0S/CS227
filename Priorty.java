@@ -41,7 +41,7 @@ public class Priorty {
 
 		while (!m.CanFill()) {
 			assignRequiredCountToAll(m.readyQueue);
-			rreduceRequiredCountToAll(m.readyQueue);
+			reduceRequiredCountToAll(m.readyQueue);
 			//PCB process = m.pollReadyQueue();
 			PCB process = m.readyQueue.poll();
 			if (process == null) {
@@ -139,39 +139,39 @@ public class Priorty {
 	//Abdulmalik
 	//Edited for the concurrent exception solved after this edit.
 	// because when we do some operations in the original queue maybe there will be a concurrent exception because if this.
-	private void reduceRequiredCountToAll(Queue<PCB> queue) {
-		// Create a snapshot of the queue to avoid concurrent modification issues
-		List<PCB> processSnapshot = new ArrayList<>(queue.size());
+	// private void reduceRequiredCountToAll(Queue<PCB> queue) {
+	// 	// Create a snapshot of the queue to avoid concurrent modification issues
+	// 	List<PCB> processSnapshot = new ArrayList<>(queue.size());
 		
-		// First pass: Filter out null entries and create a clean working copy
-		for (PCB pcb : queue) {
-			if (pcb != null) {
-				processSnapshot.add(pcb);
-			}
-		}
+	// 	// First pass: Filter out null entries and create a clean working copy
+	// 	for (PCB pcb : queue) {
+	// 		if (pcb != null) {
+	// 			processSnapshot.add(pcb);
+	// 		}
+	// 	}
 
-		// Clear the original queue to rebuild it
-		queue.clear();
+	// 	// Clear the original queue to rebuild it
+	// 	queue.clear();
 
-		// Get current system load for dynamic threshold calculation
-		int systemLoad = processSnapshot.size();
+	// 	// Get current system load for dynamic threshold calculation
+	// 	int systemLoad = processSnapshot.size();
 
-		// Process each PCB in the snapshot
-		for (PCB pcb : processSnapshot) {
-			// Decrement the starvation counter
-			int newRequiredCount = pcb.getRequiredCount() - 1;
-			pcb.setRequiredCount(newRequiredCount);
+	// 	// Process each PCB in the snapshot
+	// 	for (PCB pcb : processSnapshot) {
+	// 		// Decrement the starvation counter
+	// 		int newRequiredCount = pcb.getRequiredCount() - 1;
+	// 		pcb.setRequiredCount(newRequiredCount);
 
-			// Check for starvation condition
-			if (newRequiredCount < 0) {
-				handleStarvation(pcb, systemLoad);
-			}
+	// 		// Check for starvation condition
+	// 		if (newRequiredCount < 0) {
+	// 			handleStarvation(pcb, systemLoad);
+	// 		}
 
-			// Return the PCB to the queue (whether modified or not)
-			queue.add(pcb);
-		}
-	}
-	private void rreduceRequiredCountToAll(Queue<PCB> queue) {
+	// 		// Return the PCB to the queue (whether modified or not)
+	// 		queue.add(pcb);
+	// 	}
+	// }
+	private void reduceRequiredCountToAll(Queue<PCB> queue) {
 		Queue<PCB> q = new PriorityQueue<>();
 		List<PCB> processSnapshot = new ArrayList<>(queue.size());
 		try {

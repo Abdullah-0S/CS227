@@ -70,7 +70,7 @@ public class View
 
                 break;
 
-                case 2: //Priorty //TODO:
+                case 2: //Priorty 
                     Priorty pq = new Priorty(m);
                     try {
                         Thread.sleep(10);
