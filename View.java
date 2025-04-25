@@ -1,19 +1,27 @@
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
-public class View {
+public class View 
+{
     Scanner scanner = new Scanner(System.in);
     
     model m = new model(2048); // Here to change Memory 
     
-    String fileName = "job.txt"; //This is File Name 
+    String fileName = "job.txt"; //This is File Name
     
     //Thread LoadThread = new Thread(new MyRunnable(ThreadState.LoadToJobQueue, m));               
     Thread LoadThread = new Thread(new MyRunnable(ThreadState.LoadToJobQueueWithComments, m));  //this same as a above but with comments memory full .. 
 
     boolean AutoFill = true; 
-    boolean WaitUntilFinishReading = true;
+    boolean WaitUntilFinishReading = true ;
 
-    public void menu() {
+    performance p;
+    performance p2;
+    performance p3;
+    performance all = new performance();
+
+    public void menu()
+    {
         // Read and Create a process from a file
         runReadThreadIfQueuesEmpty();
             
@@ -23,7 +31,8 @@ public class View {
         System.out.println("Starting Loading...");   
 
         int option = 0;
-        do {
+        do
+        {
             display_mainMenu();
             try { 
                 option = scanner.nextInt();
@@ -33,21 +42,22 @@ public class View {
                 continue;
             }
             System.out.println();
-            if (option != -1)
+            if (option != -1 && option != 4)
                 runReadThreadIfQueuesEmpty();
             HoldUntilFinish();
             System.out.println();
             try {
-                Thread.sleep(125); 
+                Thread.sleep(125);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            switch (option) {
+            switch (option) 
+            {
                 case 1: 
                     //FCFS
                     FCFS fcfs = new FCFS(m);
                 
-                    Thread runFCFS = new Thread(new MyRunnable(ThreadState.Execute_FCFS, m, fcfs));
+                    Thread runFCFS = new Thread(new MyRunnable(ThreadState.Execute_FCFS, m,fcfs));
                     runFCFS.start();
                     try {
                         runFCFS.join();
@@ -55,79 +65,133 @@ public class View {
                         e.printStackTrace();
                     }
 
-                    performance p = new performance(Algorithm.FCFS, fcfs.getFinishedQueue());
+                     p = new performance(Algorithm.FCFS,fcfs.getFinishedQueue());
                     System.out.println(p); // Print performance of a algorithm such as AvgTurnaround , AvgWaitingTime..
 
                 break;
 
                 case 2: //Priorty //TODO:
                     Priorty pq = new Priorty(m);
-
-                    Thread runPQ = new Thread(new MyRunnable(ThreadState.Execute_PQ, m, pq));
+                    try {
+                        Thread.sleep(10);
+                    } catch (Exception e) {
+                    }
+                    Thread runPQ = new Thread(new MyRunnable(ThreadState.Execute_PQ, m,pq));
                     runPQ.start();
-                    try { // إضافة try-catch حول تنفيذ الخيط
+                    try {
                         runPQ.join();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
 
-                    performance p2 = new performance(Algorithm.Priority, pq.getFinishedQueue());
+                     p2 = new performance(Algorithm.Priority,pq.getFinishedQueue());
                     System.out.println(p2); // Print performance of a algorithm such as AvgTurnaround , AvgWaitingTime..
                 break;
 
-                case 3://Round Robin
+                case 3://Rouund Roubin
                     //getting quantum time
                     System.out.println("Enter the quantum time: ");
-                    System.out.print("-->");
-                    int quantum = scanner.nextInt();                   
+                    int quantum = 0;
+                    do
+                    {
+                        try
+                        {
+                            System.out.print("-->");
+                            quantum = scanner.nextInt();
+                            System.out.println();                   
+                        }
+                        catch(InputMismatchException e)
+                        {
+                            scanner.next();
+                            System.out.println("Please enter a positive number");
+                            System.out.println();
+                        }
+                    }while (quantum <= 0);
+                    
                     
                     RR rr = new RR(m);
-                    Thread runRR = new Thread(new MyRunnable(ThreadState.Execute_RR, m, rr, quantum));
+                    Thread runRR = new Thread(new MyRunnable(ThreadState.Execute_RR, m,rr,quantum));
                     runRR.start();
-                    try { 
+                    try {
                         runRR.join();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
 
-                    performance p3 = new performance(Algorithm.Round_Robin, rr.getFinishedQueue());
+                     p3 = new performance(Algorithm.Round_Robin, rr.getFinishedQueue());
                     System.out.println(p3); // Print performance of a algorithm such as AvgTurnaround , AvgWaitingTime..
+                    
                     
                 break;
  
                 case 4://Print best
                 //RUN 1 ,2 ,3 AND THEN USE PERFORMANCE
-                System.out.println(m.readyQueue.size());
-                m.print_allQueue();
+                int ch =0;
+                    do{
+                        System.out.println("To get best info try using all algorithm because performance depends on them");
+                        System.out.println();
+                        System.out.println("1- Best TurnAroundTime");
+                        System.out.println("2- Best AvgWaitingTime");
+                        System.out.println("3- Best FirstResponseTime");
+                        System.out.println("4- Best FinishResponseTime");
+                        System.out.println("-1 Exit ");
+                        System.out.println();
+                        if (p == null){System.out.println("Warning You Didnt try using FCFS ");}
+                        if (p2 == null){System.out.println("Warning You Didnt try using Priorty ");}
+                        if (p3 == null){System.out.println("Warning You Didnt try using Round Roubin ");}
+                        System.out.print("--> ");
+                        ch = scanner.nextInt();
+                        System.out.println();
+                        try
+                        {
+                            if(ch ==1 )
+                                all.BetterPerformanceAt(p,p2,p3,status.TurnAroundTime);
+                            else if (ch ==2 )
+                                all.BetterPerformanceAt(p,p2,p3,status.WaitingTime);
+                           else if(ch ==3 )
+                                all.BetterPerformanceAt(p,p2,p3,status.FirstResponseTime);
+                            else if (ch ==4 )
+                                all.BetterPerformanceAt(p,p2,p3,status.FinishResponseTime);
+                            else
+                                System.out.println("Invalid input");
+                        }
+                        catch (Exception e )
+                        {
+                            System.out.println("Use All function then try again ");
+                            ch = -1 ;
+                        }
 
-                break;
+                    }while(ch != -1);
+
+                    break;
+                
                 case -1:
                     System.out.println("Exiting...");
-                    LoadThread.interrupt();  
+                    LoadThread.interrupt();
                 break;
 
                 default:
-
+                    System.out.println("Invalid input. Please enter a valid option.");
                 break;
             }
-        } while (option != -1);
+        }while(option != -1);
     }
 
-    public void display_mainMenu() {
+    public void display_mainMenu()
+    {
         System.out.println();
         System.out.println( "* * * * * * * * * * * * * * *");
         System.out.println("*          Welcome          *");
         System.out.println("*  Please select an option: *");
         System.out.println("*    1.FCFS                 *"); // process
         System.out.println("*    2.Priorty              *");
-        System.out.println("*    3.Round Robin          *");
+        System.out.println("*    3.Round Roubin         *");
         System.out.println("*    4.Best Status          *");
         System.out.println("*    -1.Exit                *");
         System.out.println( "* * * * * * * * * * * * * * *");
         System.out.println();
         System.out.print("-->");
     }
-
     private void runReadThreadIfQueuesEmpty() {
         if (AutoFill && m.CanFill()) {
             WaitUntilFinishReading = true;
@@ -136,19 +200,24 @@ public class View {
                 Thread readThread = new Thread(new MyRunnable(ThreadState.read, m, fileName));
                 readThread.start();
                 readThread.join();
-            } catch(Exception e) {  
+            } catch(Exception e) {
                 e.printStackTrace();
             } 
             System.out.println("Job Queue Fulled");
             WaitUntilFinishReading = false;
         }
     }
-
-    private void HoldUntilFinish() {
-        while(WaitUntilFinishReading) {
+    private void HoldUntilFinish()
+    {
+        while(WaitUntilFinishReading)
+        {
             ;
         }
     }
+
+
+
+
 
     public static void main(String[] args) {
         View v = new View();

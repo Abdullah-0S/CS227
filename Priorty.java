@@ -1,8 +1,5 @@
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.*;
 // This class was done by abdulmalik 
 
 public class Priorty {
@@ -21,8 +18,19 @@ public class Priorty {
 		clearEachSteps();
 
 		// Insert all the values of ready queue into priortyqueue and change readyqueue pointer from linkedlist queue to priorty queue
-		Queue<PCB> temp = new PriorityQueue<>(new LinkedList<>(m.readyQueue)); 
-		m.readyQueue = temp; 
+//		Queue<PCB> temp = new PriorityQueue<>(new LinkedList<>(m.readyQueue));
+//		m.readyQueue = temp;
+// In Priorty.java, modify the queue conversion:
+
+		// Abdulmalik
+		//help fixing the problem of null pointer exception by checking then adding it
+		Queue<PCB> temp = new PriorityQueue<>();
+		for (PCB pcb : new LinkedList<>(m.readyQueue)) {
+			if (pcb != null) {
+				temp.add(pcb);
+			}
+		}
+		m.readyQueue = temp;
 		//
 		 
 		m.removeNullsFromReadyQueue();
@@ -33,13 +41,14 @@ public class Priorty {
 
 		while (!m.CanFill()) {
 			assignRequiredCountToAll(m.readyQueue);
-			reduceRequiredCountToAll(m.readyQueue);
-			PCB process = m.pollReadyQueue();
+			rreduceRequiredCountToAll(m.readyQueue);
+			//PCB process = m.pollReadyQueue();
+			PCB process = m.readyQueue.poll();
 			if (process == null) {
 
 				try 
 				{
-					Thread.sleep(100); 
+					Thread.sleep(10); 
 				} catch (Exception e) 
 				{
 
@@ -88,7 +97,7 @@ public class Priorty {
 				
 				try 
 				{
-					Thread.sleep(100); 
+					Thread.sleep(130); 
 				} catch (Exception e) 
 				{
 
@@ -103,28 +112,146 @@ public class Priorty {
 		}
 	}
 	// I want u to reduce each requiredCount -= 1 and if somone is negative prints it and say there was starvation and then use assignRequiredCountToAll to change its value 
-	private void reduceRequiredCountToAll(Queue<PCB> q){
-		for (PCB pcb : q)
+//	private void reduceRequiredCountToAll(Queue<PCB> q){
+//		for (PCB pcb : q)
+//		{
+//			if (pcb == null) {
+//
+//				try
+//				{
+//					Thread.sleep(100);
+//				} catch (Exception e)
+//				{
+//
+//				}
+//
+//				continue;
+//			}
+//			pcb.setRequiredCount(pcb.getRequiredCount() - 1);
+//			if (pcb.getRequiredCount() < 0 && q.peek() != pcb)
+//			{
+//				System.out.println("There has been starvation for the pcb with id: "+pcb.getId()+" in the running queue");
+//				pcb.setRequiredCount(-1);
+//			}
+//		}
+//	}
+
+	//Abdulmalik
+	//Edited for the concurrent exception solved after this edit.
+	// because when we do some operations in the original queue maybe there will be a concurrent exception because if this.
+	private void reduceRequiredCountToAll(Queue<PCB> queue) {
+		// Create a snapshot of the queue to avoid concurrent modification issues
+		List<PCB> processSnapshot = new ArrayList<>(queue.size());
+		
+		// First pass: Filter out null entries and create a clean working copy
+		for (PCB pcb : queue) {
+			if (pcb != null) {
+				processSnapshot.add(pcb);
+			}
+		}
+
+		// Clear the original queue to rebuild it
+		queue.clear();
+
+		// Get current system load for dynamic threshold calculation
+		int systemLoad = processSnapshot.size();
+
+		// Process each PCB in the snapshot
+		for (PCB pcb : processSnapshot) {
+			// Decrement the starvation counter
+			int newRequiredCount = pcb.getRequiredCount() - 1;
+			pcb.setRequiredCount(newRequiredCount);
+
+			// Check for starvation condition
+			if (newRequiredCount < 0) {
+				handleStarvation(pcb, systemLoad);
+			}
+
+			// Return the PCB to the queue (whether modified or not)
+			queue.add(pcb);
+		}
+	}
+	private void rreduceRequiredCountToAll(Queue<PCB> queue) {
+		Queue<PCB> q = new PriorityQueue<>();
+		List<PCB> processSnapshot = new ArrayList<>(queue.size());
+		try {
+			Thread.sleep(100);			
+		} catch (Exception e) {
+
+		}
+		q.addAll(queue);
+		for (PCB p : q)
 		{
-			if (pcb == null) {
-				
-				try 
-				{
-					Thread.sleep(100); 
-				} catch (Exception e) 
-				{
+			if (p != null) {
+				processSnapshot.add(p);
+			}	
+		}
+		// Clear the original queue to rebuild it
+		q.clear();
 
-				}
+		// Get current system load for dynamic threshold calculation
+		int systemLoad = processSnapshot.size();
 
-				continue;
+		// Process each PCB in the snapshot
+		for (PCB pcb : processSnapshot) {
+			// Decrement the starvation counter
+			int newRequiredCount = pcb.getRequiredCount() - 1;
+			pcb.setRequiredCount(newRequiredCount);
+
+			// Check for starvation condition
+			if (newRequiredCount < 0) {
+				handleStarvation(pcb, systemLoad);
 			}
-			pcb.setRequiredCount(pcb.getRequiredCount() - 1);
-			if (pcb.getRequiredCount() < 0 && q.peek() != pcb)
-			{
-				System.out.println("There has been starvation for the pcb with id: "+pcb.getId()+" in the running queue");
-				pcb.setRequiredCount(-1);
-			}
-		}	
+
+			// Return the PCB to the queue (whether modified or not)
+			q.add(pcb);
+		}
+		queue = q;
+	}
+
+	private void handleStarvation(PCB pcb, int systemLoad) {
+		// Starvation detected - print detailed alert
+		System.out.printf(
+				"\n⚠️ STARVATION ALERT ⚠️\n" +
+						"  Process ID: %d\n" +
+						"  Current Priority: %d\n" +
+						"  Waited for: %d cycles beyond threshold\n",
+				pcb.getId(),
+				pcb.getPriority(),
+				Math.abs(pcb.getRequiredCount())
+		);
+
+		// Calculate priority boost with upper limit
+		int oldPriority = pcb.getPriority();
+		int newPriority = Math.min(8, oldPriority + getPriorityBoostAmount(oldPriority));
+
+		// Apply changes
+		pcb.setPriority(newPriority);
+		pcb.setRequiredCount(calculateNewThreshold(systemLoad));
+
+		// Print resolution details
+		System.out.printf(
+				"✅ RESOLUTION:\n" +
+						"  Priority increased: %d → %d\n" +
+						"  New starvation threshold: %d cycles\n" +
+						"  System load consideration: %d active processes\n\n",
+				oldPriority,
+				newPriority,
+				pcb.getRequiredCount(),
+				systemLoad
+		);
+	}
+
+	// Helper method to determine how much to boost priority
+	private int getPriorityBoostAmount(int currentPriority) {
+		// Higher priority processes get smaller boosts
+		return currentPriority >= 6 ? 1 : 2;
+	}
+
+	// Helper method to calculate new starvation threshold
+	private int calculateNewThreshold(int systemLoad) {
+		// Base threshold + load factor
+		return Math.max(5, systemLoad * 2);
 	}
 	// public void printPCBRequiredCounts(Queue<PCB> q) {
 	// 	for (PCB pcb : q) {

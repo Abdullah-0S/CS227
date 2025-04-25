@@ -1,7 +1,6 @@
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
+
 public class model implements SystemCalls
 {
     Queue<PCB> readyQueue = new LinkedList<PCB>();
@@ -133,7 +132,7 @@ public class model implements SystemCalls
         if (this.JobQueue.isEmpty())
         {
             // System.out.println("empty");
-            System.out.println("Job Queue is empty");
+            //System.out.println("Job Queue is empty");
            try {
                Thread.currentThread().sleep(500); 
 
@@ -301,7 +300,21 @@ public class model implements SystemCalls
         }
         System.out.print("}\n");
     }
-    
+//    public void print_JobQueue()
+//    {
+//        System.out.println("Job Queue: { ");
+//
+//        // Use Iterator to avoid ConcurrentModificationException
+//        Iterator<PCB> iterator = JobQueue.iterator();
+//        while (iterator.hasNext()) {
+//            PCB pcb = iterator.next();
+//            System.out.print("PID: " + pcb.getId() + " ,");
+//        }
+//
+//        System.out.print("}\n");
+//    }
+
+
     public void print_Memory()
     {
         System.out.println("Current Memory: " + currentmemory);
@@ -375,13 +388,43 @@ public class model implements SystemCalls
     {
         return (this.readyQueue.isEmpty()&& this.JobQueue.isEmpty());
     }
-    public PCB pollReadyQueue(){
+//    public PCB pollReadyQueue(){
+//        PCB pcb = readyQueue.poll();
+//        while (pcb == null && !readyQueue.isEmpty()) {
+//            pcb = readyQueue.poll();
+//        }
+//        return pcb;
+//    }
+// Abdulmalik
+    /*
+    an additional check for null values and also checks if the Ready Queue is a PriorityQueue.
+     This is a modification to ensure that null entries are properly handled and that PriorityQueue
+     elements are processed correctly:
+     */
+
+public PCB pollReadyQueue() {
+    if (readyQueue.isEmpty()) {
+        return null;
+    }
+
+    // Handle PriorityQueue specially
+    if (readyQueue instanceof PriorityQueue) {
+        PCB pcb = null;
+        while (!readyQueue.isEmpty() && pcb == null) {
+            pcb = readyQueue.poll(); // Safe poll that skips nulls
+        }
+        return pcb;
+    }
+    // Handle regular Queue
+    else {
         PCB pcb = readyQueue.poll();
+        // Additional null check for regular queues
         while (pcb == null && !readyQueue.isEmpty()) {
             pcb = readyQueue.poll();
         }
-        return pcb; 
+        return pcb;
     }
+}
     public void addToReadyQueue(PCB pcb){
         if (pcb != null) {
             readyQueue.add(pcb);
