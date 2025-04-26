@@ -13,15 +13,15 @@ public class FCFS {
     public FCFS(model systemModel) {
         this.systemModel = systemModel;
     }
-
     public void schedule(Queue<PCB> readyQueue, Queue<PCB> jobQueue) {
         systemModel.removeNullsFromReadyQueue();
         clearEachSteps();
         clearFinishedQueue();
-        
         System.out.println("\nExecuting FCFS Scheduling:");
 
-        while (!(jobQueue.isEmpty() && readyQueue.isEmpty())) {
+        while (!systemModel.isQueuesEmpty()) 
+        {
+
             try {  
                 PCB process = readyQueue.poll();
                 if (process == null) {
