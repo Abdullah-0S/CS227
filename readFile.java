@@ -18,7 +18,7 @@ public class readFile {
                     continue;
                 }
                 if (!line.contains(";")) {
-                    System.out.println("skip line not same pattern");
+                    System.out.println("Skip line not same pattern "+line);
                     continue;
                 }
                 // 1:2:3:4;1024
@@ -43,6 +43,7 @@ public class readFile {
             System.out.println("Error reading file: " + e.getMessage());
             e.printStackTrace();
         }
+        System.out.println();
         return list; 
     }
 
@@ -56,26 +57,26 @@ public class readFile {
     } 
 
     // Testing
-    public static void main(String[] args) {
-        List<int[]> l = read("job.txt");
-        for (int i = 0; i < l.size(); i++) {
-            if (l.get(i).length != 4) {
-                System.out.println("Error in line " + i + " in the file");
-                continue;
-            }
-            System.out.println("ID: " + l.get(i)[0] + ", burst In ms: " + l.get(i)[1] + ", Priority: " + l.get(i)[2] + ", Required Memory in MB: " + l.get(i)[3]);
-        }
+    // public static void main(String[] args) {
+    //     List<int[]> l = read("job.txt");
+    //     for (int i = 0; i < l.size(); i++) {
+    //         if (l.get(i).length != 4) {
+    //             System.out.println("Error in line " + i + " in the file");
+    //             continue;
+    //         }
+    //         System.out.println("ID: " + l.get(i)[0] + ", burst In ms: " + l.get(i)[1] + ", Priority: " + l.get(i)[2] + ", Required Memory in MB: " + l.get(i)[3]);
+    //     }
 
-        List<PCB> list = null;
-        try {  
-            list = read_returnPcbs("job.txt");   
-        } catch (IOException e) {  
-            System.out.println("Error reading or parsing file: " + e.getMessage());
-            e.printStackTrace();
-        }
+    //     List<PCB> list = null;
+    //     try {  
+    //         list = read_returnPcbs("job.txt");   
+    //     } catch (IOException e) {  
+    //         System.out.println("Error reading or parsing file: " + e.getMessage());
+    //         e.printStackTrace();
+    //     }
 
-        for (int i = 0; i < list.size(); i++) {
-            System.out.println(list.get(i));
-        }
-    }
+    //     for (int i = 0; i < list.size(); i++) {
+    //         System.out.println(list.get(i));
+    //     }
+    // }
 }

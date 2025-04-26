@@ -98,7 +98,7 @@ public class MyRunnable implements Runnable {
                        // Thread.sleep(000);
                     //    Thread.sleep(500);
                     //    System.out.println("Trying to load"); 
-                       System.out.println(m.JobQueue.size()); 
+                       //System.out.println(m.JobQueue.size()); 
                         m.loadWithoutPrinting();
                     }catch(Exception e)
                     {
@@ -114,10 +114,10 @@ public class MyRunnable implements Runnable {
                     try{
                         //Thread.sleep(4000);
                         
-                    //    Thread.sleep(500);
+                        Thread.sleep(200);
                     //    System.out.println("Trying to load");
                     //    System.out.println(m.JobQueue.size()); 
-                       m.loadWithoutPrinting();
+                       m.load();
                     }catch(Exception e)
                     {
                         break;                   
@@ -134,7 +134,7 @@ public class MyRunnable implements Runnable {
                 m.killProcess(killProcessWithPid);
             break;
             case Execute_RR:
-                rr.RRsechduala(quantum);
+                rr.RRsechdual(quantum);
                 rr.printGantChart(); // print gantChart
             break;
 

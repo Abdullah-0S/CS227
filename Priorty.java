@@ -39,7 +39,7 @@ public class Priorty {
 		// Step 2: Move processes from Ready Queue to Priority Queue
 		System.out.println("\nExecuting Non-Preemptive Priority Scheduling:");
 
-		while (!m.CanFill()) {
+		while (!m.isQueuesEmpty()) {
 			assignRequiredCountToAll(m.readyQueue);
 			reduceRequiredCountToAll(m.readyQueue);
 			//PCB process = m.pollReadyQueue();
@@ -275,35 +275,35 @@ public class Priorty {
 		return eachStep;
 	}
 	// Testing
-	public static void main(String[] args) {
-		// model m = new model(); // Create system model
-        // m.print_Memory();
+	// public static void main(String[] args) {
+	// 	// model m = new model(); // Create system model
+    //     // m.print_Memory();
 
-		// List<PCB> process = null;
-        // try {
-        //     process = readFile.read_returnPcbs("./job.txt");
-        // } catch (IOException e) {
-        //     e.printStackTrace();
-        // } // Read process data
+	// 	// List<PCB> process = null;
+    //     // try {
+    //     //     process = readFile.read_returnPcbs("./job.txt");
+    //     // } catch (IOException e) {
+    //     //     e.printStackTrace();
+    //     // } // Read process data
 
-		// for (int i = 0; i < process.size(); i++) {
-		// 	m.createProcess(process.get(i)); // Add process to system
-		// }
-		// process = null; // Clear process list
+	// 	// for (int i = 0; i < process.size(); i++) {
+	// 	// 	m.createProcess(process.get(i)); // Add process to system
+	// 	// }
+	// 	// process = null; // Clear process list
 
-		// while (!m.JobQueue.isEmpty()) {
-		// 	m.load();
-		// }
+	// 	// while (!m.JobQueue.isEmpty()) {
+	// 	// 	m.load();
+	// 	// }
 
-		// Priorty scheduler = new Priorty(m);
-		// Queue<PCB> FinishedQueue = scheduler.PQ(m.readyQueue, m.readyQueue.size());
+	// 	// Priorty scheduler = new Priorty(m);
+	// 	// Queue<PCB> FinishedQueue = scheduler.PQ(m.readyQueue, m.readyQueue.size());
 
-		// // Step 4: Print finished processes information
-		// System.out.println("\nFinished Processes:");
-		// for (PCB process1 : FinishedQueue) {
-		// 	System.out.println("PID: " + process1.getId() + ", Waiting Time: " + process1.getWaitingTime()
-		// 			+ ", First Response Time: " + process1.getFirstResponseTime() + ", Finish Time: "
-		// 			+ process1.getFinishTime());
-		// }
-	}
+	// 	// // Step 4: Print finished processes information
+	// 	// System.out.println("\nFinished Processes:");
+	// 	// for (PCB process1 : FinishedQueue) {
+	// 	// 	System.out.println("PID: " + process1.getId() + ", Waiting Time: " + process1.getWaitingTime()
+	// 	// 			+ ", First Response Time: " + process1.getFirstResponseTime() + ", Finish Time: "
+	// 	// 			+ process1.getFinishTime());
+	// 	// }
+	// }
 }

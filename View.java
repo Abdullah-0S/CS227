@@ -1,3 +1,4 @@
+import java.util.ConcurrentModificationException;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -9,8 +10,8 @@ public class View
     
     String fileName = "job.txt"; //This is File Name
     
-    //Thread LoadThread = new Thread(new MyRunnable(ThreadState.LoadToJobQueue, m));               
-    Thread LoadThread = new Thread(new MyRunnable(ThreadState.LoadToJobQueueWithComments, m));  //this same as a above but with comments memory full .. 
+    Thread LoadThread = new Thread(new MyRunnable(ThreadState.LoadToJobQueue, m));               
+    //Thread LoadThread = new Thread(new MyRunnable(ThreadState.LoadToJobQueueWithComments, m));  //this same as a above but with comments memory full .. 
 
     boolean AutoFill = true; 
     boolean WaitUntilFinishReading = true ;
@@ -28,7 +29,8 @@ public class View
         //Auto Load Thread from job Queue to ready Queue
         LoadThread.setDaemon(true); // if main dies it dies 
         LoadThread.start();
-        System.out.println("Starting Loading...");   
+        System.out.println();
+        System.out.println("Start Auto Load...");   
 
         int option = 0;
         do
@@ -56,14 +58,16 @@ public class View
                 case 1: 
                     //FCFS
                     FCFS fcfs = new FCFS(m);
-                
-                    Thread runFCFS = new Thread(new MyRunnable(ThreadState.Execute_FCFS, m,fcfs));
-                    runFCFS.start();
-                    try {
-                        runFCFS.join();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                    fcfs.schedule(m.readyQueue,m.JobQueue);
+
+                    fcfs.printGantChart(); // print gantChart
+                        // Thread runFCFS = new Thread(new MyRunnable(ThreadState.Execute_FCFS, m,fcfs));
+                        // runFCFS.start();
+                        // try {
+                        //     runFCFS.join();
+                        // } catch (InterruptedException e) {
+                        //     e.printStackTrace();
+                        // }
 
                      p = new performance(Algorithm.FCFS,fcfs.getFinishedQueue());
                     System.out.println(p); // Print performance of a algorithm such as AvgTurnaround , AvgWaitingTime..
@@ -76,16 +80,24 @@ public class View
                         Thread.sleep(10);
                     } catch (Exception e) {
                     }
-                    Thread runPQ = new Thread(new MyRunnable(ThreadState.Execute_PQ, m,pq));
-                    runPQ.start();
-                    try {
-                        runPQ.join();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                    try{
+                        pq.PQ();
+                        pq.printGantChart();
+                        p2 = new performance(Algorithm.Priority,pq.getFinishedQueue());
+                        System.out.println(p2); // Print performance of a algorithm such as AvgTurnaround , AvgWaitingTime..    
+                    } catch(ConcurrentModificationException e)
+                    {
+                        System.out.println();
+                        System.err.println("Please Try again but slower ");
                     }
+                        // Thread runPQ = new Thread(new MyRunnable(ThreadState.Execute_PQ, m,pq));
+                        // runPQ.start();
+                        // try {
+                        //     runPQ.join();
+                        // } catch (InterruptedException e) {
+                        //     e.printStackTrace();
+                        // }
 
-                     p2 = new performance(Algorithm.Priority,pq.getFinishedQueue());
-                    System.out.println(p2); // Print performance of a algorithm such as AvgTurnaround , AvgWaitingTime..
                 break;
 
                 case 3://Rouund Roubin
@@ -94,6 +106,10 @@ public class View
                     int quantum = 0;
                     do
                     {
+                        if (quantum <= 0)
+                        {
+                            System.out.println("Please enter a positive number");
+                        }
                         try
                         {
                             System.out.print("-->");
@@ -110,13 +126,15 @@ public class View
                     
                     
                     RR rr = new RR(m);
-                    Thread runRR = new Thread(new MyRunnable(ThreadState.Execute_RR, m,rr,quantum));
-                    runRR.start();
-                    try {
-                        runRR.join();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                    rr.RRsechdual(quantum);
+                    rr.printGantChart(); // print gantChart
+                        // Thread runRR = new Thread(new MyRunnable(ThreadState.Execute_RR, m,rr,quantum));
+                        // runRR.start();
+                        // try {
+                        //     runRR.join();
+                        // } catch (InterruptedException e) {
+                        //     e.printStackTrace();
+                        // }
 
                      p3 = new performance(Algorithm.Round_Robin, rr.getFinishedQueue());
                     System.out.println(p3); // Print performance of a algorithm such as AvgTurnaround , AvgWaitingTime..
@@ -139,8 +157,22 @@ public class View
                         if (p == null){System.out.println("Warning You Didnt try using FCFS ");}
                         if (p2 == null){System.out.println("Warning You Didnt try using Priorty ");}
                         if (p3 == null){System.out.println("Warning You Didnt try using Round Roubin ");}
+                        System.out.println();
                         System.out.print("--> ");
-                        ch = scanner.nextInt();
+                        do
+                        {
+                            if (ch == -1) break;
+                            try
+                            {
+                                ch = scanner.nextInt();
+                            }catch(InputMismatchException e){
+                                System.out.println("Invalid input please enter correct number");
+                                scanner.next(); // clear buffer "Enter"
+                                System.out.print("-->"); 
+                                ch = scanner.nextInt();
+                                System.out.println();
+                            }
+                        }while(ch < 0);
                         System.out.println();
                         try
                         {
@@ -152,12 +184,16 @@ public class View
                                 all.BetterPerformanceAt(p,p2,p3,status.FirstResponseTime);
                             else if (ch ==4 )
                                 all.BetterPerformanceAt(p,p2,p3,status.FinishResponseTime);
+                            else if (ch == -1)
+                            {
+
+                            }
                             else
                                 System.out.println("Invalid input");
                         }
                         catch (Exception e )
                         {
-                            System.out.println("Use All function then try again ");
+                            System.out.println("Error, Use All function then try again ");
                             ch = -1 ;
                         }
 
@@ -166,8 +202,8 @@ public class View
                     break;
                 
                 case -1:
-                    System.out.println("Exiting...");
                     LoadThread.interrupt();
+                    System.out.println("Exiting...");
                 break;
 
                 default:
@@ -193,9 +229,10 @@ public class View
         System.out.print("-->");
     }
     private void runReadThreadIfQueuesEmpty() {
-        if (AutoFill && m.CanFill()) {
+        if (AutoFill && m.isQueuesEmpty()) {
             WaitUntilFinishReading = true;
-            System.out.println("Start Reading file");
+            System.out.println("\n---------\nStart Reading file\n---------");
+            System.out.println();
             try {
                 Thread readThread = new Thread(new MyRunnable(ThreadState.read, m, fileName));
                 readThread.start();
@@ -203,7 +240,9 @@ public class View
             } catch(Exception e) {
                 e.printStackTrace();
             } 
-            System.out.println("Job Queue Fulled");
+            System.out.println();
+            System.out.println("Job Queue is Filled");
+            System.out.println();
             WaitUntilFinishReading = false;
         }
     }

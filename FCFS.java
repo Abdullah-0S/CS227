@@ -70,62 +70,62 @@ public class FCFS {
         RR.gantChart(eachSteps);
     }
 
-    public Queue<PCB> scheduleWithoutFree(Queue<PCB> readyQueue, int numOfProccess) {
-        Queue<PCB> finishedQueue = new LinkedList<>();
-        List<eachStep> eachSteps = new LinkedList<>();
+    // public Queue<PCB> scheduleWithoutFree(Queue<PCB> readyQueue, int numOfProccess) {
+    //     Queue<PCB> finishedQueue = new LinkedList<>();
+    //     List<eachStep> eachSteps = new LinkedList<>();
 
-        System.out.println("\nExecuting FCFS Scheduling:");
+    //     System.out.println("\nExecuting FCFS Scheduling:");
 
-        while (numOfProccess > 0) {
-            try {  
-                PCB process = readyQueue.poll();
+    //     while (numOfProccess > 0) {
+    //         try {  
+    //             PCB process = readyQueue.poll();
                 
-                // حساب زمن الانتظار لكل عملية
-                process.setFirstResponseTime(time);
-                process.setWaitingTime(time);
-                process.setState(State.RUNNING);
+    //             // حساب زمن الانتظار لكل عملية
+    //             process.setFirstResponseTime(time);
+    //             process.setWaitingTime(time);
+    //             process.setState(State.RUNNING);
 
-                System.out.println("Process " + process.getId() + " executed from " + time + " to " + (time + process.getBurstTime()));
-                eachSteps.addLast(new eachStep(process.getId(), time, time + process.getBurstTime()));
+    //             System.out.println("Process " + process.getId() + " executed from " + time + " to " + (time + process.getBurstTime()));
+    //             eachSteps.addLast(new eachStep(process.getId(), time, time + process.getBurstTime()));
                 
-                // تحديث الزمن
-                time += process.getBurstTime();
+    //             // تحديث الزمن
+    //             time += process.getBurstTime();
 
-                process.setFinishTime(time);
-                process.setBurstTime(0);
-                process.setState(State.Terminated);
+    //             process.setFinishTime(time);
+    //             process.setBurstTime(0);
+    //             process.setState(State.Terminated);
 
-                finishedQueue.add(process);
-                //systemModel.free(process);
-                numOfProccess--;
-            } catch (Exception e) { 
-                System.out.println("Error during process scheduling: " + e.getMessage());
-            }
-        }
-        RR.gantChart(eachSteps);
-        return finishedQueue;
-    }
+    //             finishedQueue.add(process);
+    //             //systemModel.free(process);
+    //             numOfProccess--;
+    //         } catch (Exception e) { 
+    //             System.out.println("Error during process scheduling: " + e.getMessage());
+    //         }
+    //     }
+    //     RR.gantChart(eachSteps);
+    //     return finishedQueue;
+    // }
 
     // Testing the FCFS Scheduler
-    public static void main(String[] args) {
-        model systemModel = new model();
+    // public static void main(String[] args) {
+    //     model systemModel = new model();
 
-        try {  
-            // Read processes from file and load into the system
-            for (int[] processInfo : readFile.read("job.txt")) {
-                PCB process = new PCB(processInfo);
-                systemModel.createProcess(process);
-            }
+    //     try {  
+    //         // Read processes from file and load into the system
+    //         for (int[] processInfo : readFile.read("job.txt")) {
+    //             PCB process = new PCB(processInfo);
+    //             systemModel.createProcess(process);
+    //         }
 
-            // Move jobs to ready queue
-            while (!systemModel.JobQueue.isEmpty()) {
-                systemModel.load();
-            }
+    //         // Move jobs to ready queue
+    //         while (!systemModel.JobQueue.isEmpty()) {
+    //             systemModel.load();
+    //         }
 
-            // Run FCFS Scheduler
-            systemModel.execute(Algorithm.FCFS, systemModel.readyQueue.size());
-        } catch (Exception e) {  
-            System.out.println("Error during system setup: " + e.getMessage());
-        }
-    }
+    //         // Run FCFS Scheduler
+    //         systemModel.execute(Algorithm.FCFS, systemModel.readyQueue.size());
+    //     } catch (Exception e) {  
+    //         System.out.println("Error during system setup: " + e.getMessage());
+    //     }
+    // }
 }

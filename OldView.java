@@ -307,8 +307,8 @@ public class OldView {
         } while (option != -1 && option != -2);
     }
 
-    public static void main(String[] args) {
-        OldView v = new OldView();
-        v.display_mainMenu();
-    }
+    // public static void main(String[] args) {
+    //     OldView v = new OldView();
+    //     v.display_mainMenu();
+    // }
 }

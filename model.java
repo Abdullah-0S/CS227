@@ -104,9 +104,15 @@ public class model implements SystemCalls
     }
     public void load() // load the process from the job queue to the ready queue
     {
-        if (JobQueue.isEmpty())
+        if (this.JobQueue.isEmpty())
         {
             System.out.println("Job Queue is empty");
+            try 
+            {
+               Thread.sleep(1500); 
+            } catch (Exception e) {
+
+            }
             return;
         }
         PCB pcb = JobQueue.poll();
@@ -118,14 +124,6 @@ public class model implements SystemCalls
         pcb.setState(State.READY);
         addToReadyQueue(pcb);
         System.out.println("Process loaded with PID: " + pcb.getId());
-    }
-    public void loadAll_Process()
-    {
-        for(int i = 0 ; i < JobQueue.size(); i++)
-        {
-            load();
-        }
-
     }
     public void loadWithoutPrinting() // load the process from the job queue to the ready queue
     {
@@ -152,6 +150,14 @@ public class model implements SystemCalls
         //System.out.println("Process loaded with PID: " + pcb.getId());
     }
     public void loadAll_ProcessWithoutPrinting()
+    {
+        for(int i = 0 ; i < JobQueue.size(); i++)
+        {
+            loadWithoutPrinting();
+        }
+
+    }
+    public void loadAll_Process()
     {
         for(int i = 0 ; i < JobQueue.size(); i++)
         {
@@ -384,7 +390,7 @@ public class model implements SystemCalls
             System.out.println("Ready Queue is Empty");
         }
    }
-    public boolean CanFill()
+    public boolean isQueuesEmpty()
     {
         return (this.readyQueue.isEmpty()&& this.JobQueue.isEmpty());
     }
@@ -440,9 +446,12 @@ public PCB pollReadyQueue() {
         readyQueue.clear();
         readyQueue.addAll(temp);
     }
+    public void print_GanttChart(List<eachStep> eachSteps) {
+        RR.gantChart(eachSteps);
+    }
 }
 
 enum Algorithm
 {
-    FCFS, Round_Robin, Priority,All;
+    FCFS, Round_Robin, Priority, All;
 }
