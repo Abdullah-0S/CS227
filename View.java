@@ -106,10 +106,7 @@ public class View
                     int quantum = 0;
                     do
                     {
-                        if (quantum <= 0)
-                        {
-                            System.out.println("Please enter a positive number");
-                        }
+                        
                         try
                         {
                             System.out.print("-->");
@@ -119,6 +116,11 @@ public class View
                         catch(InputMismatchException e)
                         {
                             scanner.next();
+                           // System.out.println("Please enter a positive number");
+                            System.out.println();
+                        }
+                        if (quantum <= 0)
+                        {
                             System.out.println("Please enter a positive number");
                             System.out.println();
                         }

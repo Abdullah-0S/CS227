@@ -65,7 +65,7 @@ public class RR {
         
         System.out.println("\nExecuting Round-Robin Scheduling:");
 
-        while (m.isQueuesEmpty())
+        while (!m.isQueuesEmpty())
         {
             
             PCB runningProcess = m.pollReadyQueue();
