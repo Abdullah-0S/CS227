@@ -31,7 +31,28 @@ public class readFile {
                     int burstTime_In_ms = Integer.parseInt(values[1]);
                     int priority = Integer.parseInt(values[2]);
                     int reqMemory = Integer.parseInt(parts[1]);
+                    if (pid < 0)
+                    {
+                        System.out.println("Skip line "+line+ ": Process ID must be greater than 0");
+                        continue;
+                    }
+                    if (burstTime_In_ms <= 0 )
+                    {
+                        System.out.println("Skip line "+line+ ": burst time must be greater than 0");
+                        continue;
+                    }
+                    if (reqMemory <= 0 )
+                    {
+                        System.out.println("Skip line "+line+ ":required memory should be greater than 0");
+                        continue;
+                    }
+                    if (priority <= 0)
+                    {
 
+                        System.out.println("Skip line "+line+ ": priority must be greater than 0");
+                        continue;
+                    }
+                   
                     list.add(new int[]{pid, burstTime_In_ms, priority, reqMemory});
                 } catch (NumberFormatException e) {  
                     System.out.println("Error parsing numbers in line: " + line);
@@ -57,26 +78,8 @@ public class readFile {
     } 
 
     // Testing
-    // public static void main(String[] args) {
-    //     List<int[]> l = read("job.txt");
-    //     for (int i = 0; i < l.size(); i++) {
-    //         if (l.get(i).length != 4) {
-    //             System.out.println("Error in line " + i + " in the file");
-    //             continue;
-    //         }
-    //         System.out.println("ID: " + l.get(i)[0] + ", burst In ms: " + l.get(i)[1] + ", Priority: " + l.get(i)[2] + ", Required Memory in MB: " + l.get(i)[3]);
-    //     }
-
-    //     List<PCB> list = null;
-    //     try {  
-    //         list = read_returnPcbs("job.txt");   
-    //     } catch (IOException e) {  
-    //         System.out.println("Error reading or parsing file: " + e.getMessage());
-    //         e.printStackTrace();
-    //     }
-
-    //     for (int i = 0; i < list.size(); i++) {
-    //         System.out.println(list.get(i));
-    //     }
-    // }
+    public static void main(String[] args) {
+       read("job.txt");
+    }
+    
 }
